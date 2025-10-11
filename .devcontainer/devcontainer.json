@@ -1,0 +1,29 @@
+{
+  "name": "ETH Online 2025 ROSCA Dev Container",
+  "build": {
+    "dockerfile": "DockerFile",
+    "context": ".."
+  },
+  "workspaceFolder": "/home/ubuntu/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "JuanBlanco.solidity",
+        "tamasfe.even-better-toml",
+        "eamodio.gitlens",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-containers",
+        "ms-vscode-remote.remote-containers"
+      ]
+    }
+  },
+  "forwardPorts": [3000, 8080, 8545],
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "privileged": true,
+  "postCreateCommand": "",
+  "remoteUser": "ubuntu"
+}

@@ -1,0 +1,58 @@
+# Use the official Node.js 22 image
+FROM ubuntu:24.04
+ARG NODE_VERSION=22.20.0
+ARG USERNAME=ubuntu
+
+# Use bash for the shell
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install curl and Java
+RUN apt update && apt install -y curl \
+    gradle \
+    openjdk-21-jdk \
+    maven 
+
+# Install dockerCE and configure ubuntu user
+RUN curl -fsSL https://get.docker.com -o get-docker.sh \
+    && sh get-docker.sh \
+    && usermod -aG docker $USERNAME
+
+# Use ubuntu user (non-root)
+USER $USERNAME
+
+# Set working directory
+WORKDIR /home/ubuntu
+
+# Download and install nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash \
+    && export NVM_DIR="$HOME/.nvm" \
+    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
+    && echo node > .nvmrc \
+    && nvm install $NODE_VERSION \
+    && nvm use $NODE_VERSION \
+    && echo 'export NVM_DIR="$HOME/.nvm"' >> .bashrc \
+    && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> .bashrc \
+    && echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> .bashrc
+
+# Install pnpm and turbo
+RUN curl -fsSL https://get.pnpm.io/install.sh | bash - \
+    && export PNPM_HOME="$HOME/.local/share/pnpm" \
+    && export PATH="$PNPM_HOME:$PATH" \
+    && pnpm add turbo --global \
+    && echo 'export PNPM_HOME="$HOME/.local/share/pnpm"' >> .bashrc \
+    && echo 'export PATH="$PNPM_HOME:$PATH"' >> .bashrc
+
+# Download and install foundry
+RUN curl -L https://foundry.paradigm.xyz | bash \
+    && export PATH="$HOME/.foundry/bin:$PATH" \
+    && foundryup \
+    && echo 'export PATH="$HOME/.foundry/bin:$PATH"' >> .bashrc
+
+# Copy project files and set working directory with correct ownership
+WORKDIR /home/ubuntu/workspace
+COPY --chown=$USERNAME:$USERNAME . .
+
+# Expose common ports
+EXPOSE 3000 \
+    8545 \
+    8080

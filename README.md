@@ -1,14 +1,4 @@
-# Turborepo starter
-
-This Turborepo starter is maintained by the Turborepo core team.
-
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest
-```
+# ETHOnline 2025 Rosca
 
 ## What's inside?
 
@@ -31,6 +21,14 @@ This Turborepo has some additional tools already setup for you:
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
+
+## Getting Started
+
+When you first clone the repository, run the following commands to get started:
+
+```bash
+pnpm install
+```
 
 ### Build
 
