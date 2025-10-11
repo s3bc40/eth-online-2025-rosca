@@ -9,8 +9,7 @@
     "check-types": "turbo run check-types",
     "envio:dev": "turbo run envio-indexer#dev",
     "envio:codegen": "turbo run envio-indexer#codegen",
-    "hardhat:build": "turbo run hardhat#build",
-    "hardhat:dev": "turbo run hardhat#dev"
+    "forge:build": "turbo run foundry#build"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
