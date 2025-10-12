@@ -1,6 +1,7 @@
 import Image, { type ImageProps } from "next/image";
 import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
@@ -96,6 +97,8 @@ export default function Home() {
           />
           Go to turborepo.com →
         </a>
+        {/* Connect btn Rainbowkit */}
+        <ConnectButton />
       </footer>
     </div>
   );
