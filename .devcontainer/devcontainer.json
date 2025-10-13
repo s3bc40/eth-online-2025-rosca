@@ -1,7 +1,7 @@
 {
   "name": "ETH Online 2025 ROSCA Dev Container",
   "build": {
-    "dockerfile": "DockerFile",
+    "dockerfile": "Dockerfile",
     "context": ".."
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/ubuntu/workspace,type=bind,consistency=cached",
@@ -20,10 +20,12 @@
       ]
     }
   },
-  "forwardPorts": [3000, 5432, 5433, 8080, 8545],
   "postCreateCommand": "pnpm install && pnpm run envio:codegen",
   "remoteUser": "ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "mobs_mode": "non-root"
+    }
   }
 }

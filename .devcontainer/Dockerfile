@@ -38,9 +38,8 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | b
     && echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> .bashrc
 
 # Install pnpm and turbo
-ENV PNPM_STORE_DIR="/home/ubuntu/pnpm-store-cache"
+ENV PNPM_HOME=/home/ubuntu/.local/share/pnpm
 RUN curl -fsSL https://get.pnpm.io/install.sh | bash - \
-    && export PNPM_HOME="$HOME/.local/share/pnpm" \
     && export PATH="$PNPM_HOME:$PATH" \
     && pnpm add turbo --global \
     && echo 'export PNPM_HOME="$HOME/.local/share/pnpm"' >> .bashrc \
@@ -51,10 +50,3 @@ RUN curl -L https://foundry.paradigm.xyz | bash \
     && export PATH="$HOME/.foundry/bin:$PATH" \
     && foundryup \
     && echo 'export PATH="$HOME/.foundry/bin:$PATH"' >> .bashrc
-
-# Expose common ports
-EXPOSE 3000 \
-    5432 \
-    5433 \
-    8545 \
-    8080
