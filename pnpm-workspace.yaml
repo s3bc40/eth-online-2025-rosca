@@ -1,3 +1,4 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "apps/envio-indexer/generated" # Include generated code for TypeScript path mapping
