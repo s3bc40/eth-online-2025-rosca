@@ -11,10 +11,14 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.8",
     "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.90.2",
     "next": "^15.5.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "viem": "2.x",
+    "wagmi": "^2.18.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
