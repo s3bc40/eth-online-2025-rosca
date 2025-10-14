@@ -1,92 +1,105 @@
 # ETHOnline 2025 Rosca
 
-## What's inside?
+## Overview
 
-This Turborepo includes the following packages/apps:
+Hackathon project around Rosca (Rotating Savings and Credit Association) built with Turborepo, Next.js, Envio and Foundry. The goal is to create a decentralized platform for managing Roscas using smart contracts. Basically we move the organizer role to a smart contract and allow users to create/join roscas, contribute funds, and withdraw their share when it's their turn. To avoid trust issues, we use a multisig wallet for the organizer role, SafeWallet for the multisig wallet.
+This project is bootstrapped with [Turborepo](https://turborepo.com/), for easy monorepo management and high performance builds.
 
-### Apps and Packages
+## Tech stack
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- [Foundry](https://getfoundry.sh/) - Smart contract development framework
+- [Pyth network](https://pyth.network/) - Real-time market data
+- [Envio](https://envio.dev/) - Perfomant blockchain indexer
+- [PaypalUSD](https://www.paypal.com/us/digital-wallet/manage-money/crypto/pyusd) - Paypal Stablecoin
+- [Turborepo](https://turborepo.com/) - Monorepo management tool
+- [Next.js](https://nextjs.org/) - React framework for building web applications
+- [TypeScript](https://www.typescriptlang.org/) - Typed superset of JavaScript
+- [RainbowKit](https://www.rainbowkit.com/) - React library for wallet connection
+- [Wagmi](https://wagmi.sh/) - React hooks for Ethereum
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [SafeWallet](https://safe.global/) - Multisig wallet for secure fund management
 
 ## Getting Started
 
-When you first clone the repository, run the following commands to get started:
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (version 18 or later)
+- [pnpm](https://pnpm.io/) (version 9 or later)
+- [Foundry](https://getfoundry.sh/) (version 1.3.0 or later)
+- [Docker](https://www.docker.com/) (for devcontainer and/or running Envio)
+
+### Installation
+
+When you first clone the repository, you have two ways to install dependencies:
+
+1. Locally if you have the prerequisites installed and a UNIX-like environment (Linux, macOS, WSL2)
+2. Using the [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers) if you have Docker and VSCode installed (or any IDE that supports devcontainers)
+
+#### Local Installation
+
+When you have the prerequisites installed, run the following commands:
 
 ```bash
+cd ethonline-2025-rosca
 pnpm install
 ```
 
+It should install all dependencies for the monorepo. You can then proceed to set up Envio by:
+
+```bash
+cd apps/envio-indexer
+pnpm run codegen
+```
+
+Or run from the root:
+
+```bash
+pnpm run envio:codegen
+```
+
+This will generate the necessary packages and containers for Envio.
+
+Then you can start the Envio indexer:
+
+```bash
+cd apps/envio-indexer
+pnpm run dev
+
+# or from the root
+pnpm run envio:dev
+```
+
+If you manage to start the indexer, you can proceed to start the web app.
+
+First setup the environment variables by copying the example file:
+
+```bash
+cd apps/web
+cp .env.example .env.local
+```
+
+Set the necessary environment variables in `.env.local`, then start the web app:
+
+```bash
+pnpm run dev
+```
+
+#### Using the Devcontainer
+
+If you have Docker and VSCode installed, you can open the project in a devcontainer. This will set up a container with all the necessary dependencies installed.
+
+1. Open the project in VSCode
+2. When prompted, reopen the project in a devcontainer or use the command palette (Ctrl+Shift+P) and select "Dev Containers: Reopen in Container"
+3. Wait for the container to build and start (or use the command palette and select "Dev Containers: Rebuild Container" if you don't get prompted)
+4. Once the container is running, you should be able to run the same commands as above to set up Envio and start the web app.
+
+You should be ready to develop!
+
 ### Build
 
-To build all apps and packages, run the following command:
+WIP
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
+## Remote Caching
 
 > [!TIP]
 > Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
@@ -95,7 +108,7 @@ Turborepo can use a technique known as [Remote Caching](https://turborepo.com/do
 
 By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
 
-```
+```bash
 cd my-turborepo
 
 # With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
@@ -111,7 +124,7 @@ This will authenticate the Turborepo CLI with your [Vercel account](https://verc
 
 Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
 
-```
+```bash
 # With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
 turbo link
 
@@ -131,3 +144,15 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
 - [Configuration Options](https://turborepo.com/docs/reference/configuration)
 - [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contributors
+
+Thanks to everyone who has contributed to ETHOnline 2025!
+
+<a href="https://github.com/s3bc40/msig-ui/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=s3bc40/msig-ui" />
+</a>
