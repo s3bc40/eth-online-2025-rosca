@@ -1,37 +1,41 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IPyUsd} from "./Interface/IPyUsd.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/interfaces/AutomationCompatibleInterface.sol";
 
-contract Committee is Ownable {
-    //--------- Errors ---------
-    error Committee__TransferFailed();
-    error Committee__SenderIsNotMember();
-    error Committee__WrongContributionAmount();
+contract Committee is Ownable, AutomationCompatibleInterface {
+    //--------- Errors ---------//
     error Committee__CycleOver();
-    error Committee__WaitForNextCycleToStart();
+    error Committee__TransferFailed();
+    error Committee__UpkeepNotNeeded();
     error Committee__AlreadyWithdrawn();
+    error Committee__SenderIsNotMember();
     error Committee__NothingToWithdraw();
+    error Committee__WrongContributionAmount();
+    error Committee__WaitForNextCycleToStart();
 
-    //--------- Immutables ---------
+    //--------- Immutables ---------//
+    IPyUsd public immutable pyUsd;
+    uint256 public immutable i_totalCycles;
     uint256 public immutable i_contributionAmount;
     uint256 public immutable i_collectionInterval;
     uint256 public immutable i_distributionInterval;
-    uint256 public immutable i_totalCycles;
-    IPyUsd public immutable pyUsd;
 
-    //--------- State Variables ---------
+    //--------- State Variables ---------//
     uint256 public s_currentCycle;
     uint256 public s_lastDistributionTime;
+    uint256 public s_totalContribution;
+    uint256 public s_cycleContribution;
     address[] public s_members;
     mapping(address => bool) public s_isMember;
-    mapping(address => uint256) public s_totalContribution;
-    mapping(address => uint256) public s_cycleContribution;
-    mapping(address => uint256) public s_cycleDistribution;
+    mapping(address => uint256) public s_totalContributionPerMember;
+    mapping(address => uint256) public s_cycleContributionPerMember;
+    mapping(address => uint256) public s_cycleDistributionPerMember;
     mapping(address => bool) public s_hasWithdrawn;
 
-    //--------- Events ---------
+    //--------- Events ---------//
     event ContributionDeposited(address indexed member, uint256 contributionAmount);
     event ShareWithdrawn(address indexed member, uint256 shareAmount);
 
@@ -44,13 +48,13 @@ contract Committee is Ownable {
         address _pyUsd,
         address _multiSigAccount
     ) Ownable(_multiSigAccount) {
-        //--------- Immutables Assignments ---------
+        //--------- Immutables Assignments ---------//
         i_contributionAmount = _contributionAmount;
         i_collectionInterval = _collectionInterval;
         i_distributionInterval = _distributionInterval;
         i_totalCycles = _totalCycles;
 
-        //--------- State Variable Assignments ---------
+        //--------- State Variable Assignments ---------//
         pyUsd = IPyUsd(_pyUsd);
         s_members = _members;
         uint256 i;
@@ -63,7 +67,7 @@ contract Committee is Ownable {
     }
 
     function depositContribution(uint256 _contributionAmount) external {
-        //--------- Checks ---------
+        //--------- Checks ---------//
         if (!s_isMember[msg.sender]) {
             revert Committee__SenderIsNotMember();
         }
@@ -73,16 +77,18 @@ contract Committee is Ownable {
         if (s_currentCycle >= i_totalCycles) {
             revert Committee__CycleOver();
         }
-        if (s_cycleContribution[msg.sender] != 0) {
+        if (s_cycleContributionPerMember[msg.sender] != 0) {
             revert Committee__WaitForNextCycleToStart();
         }
 
-        //--------- Effects ---------
-        s_totalContribution[msg.sender] += i_contributionAmount;
-        s_cycleContribution[msg.sender] = i_contributionAmount;
+        //--------- Effects ---------//
+        s_totalContributionPerMember[msg.sender] += i_contributionAmount;
+        s_cycleContributionPerMember[msg.sender] = i_contributionAmount;
+        s_totalContribution += i_contributionAmount;
+        s_cycleContribution += i_contributionAmount;
         emit ContributionDeposited(msg.sender, i_contributionAmount);
 
-        //--------- Interaction ---------
+        //--------- Interaction ---------//
         bool success = pyUsd.transferFrom(msg.sender, address(this), i_contributionAmount);
         if (!success) {
             revert Committee__TransferFailed();
@@ -90,8 +96,8 @@ contract Committee is Ownable {
     }
 
     function withdrawYourShare() external {
-        uint256 share = s_cycleDistribution[msg.sender];
-        //--------- Checks ---------
+        uint256 share = s_cycleDistributionPerMember[msg.sender];
+        //--------- Checks ---------//
         if (!s_isMember[msg.sender]) {
             revert Committee__SenderIsNotMember();
         }
@@ -102,11 +108,11 @@ contract Committee is Ownable {
             revert Committee__NothingToWithdraw();
         }
 
-        //--------- Effects ---------
+        //--------- Effects ---------//
         s_hasWithdrawn[msg.sender] = true;
         emit ShareWithdrawn(msg.sender, share);
 
-        //--------- Interaction ---------
+        //--------- Interaction ---------//
         bool success = pyUsd.transfer(msg.sender, share);
         if (!success) {
             revert Committee__TransferFailed();
@@ -115,5 +121,38 @@ contract Committee is Ownable {
 
     function _isDistributionTime() private view returns (bool) {
         return block.timestamp >= s_lastDistributionTime + i_collectionInterval;
+    }
+
+    function checkUpkeep(bytes memory /* checkData */ )
+        public
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */ )
+    {
+        bool isDistributionTime = _isDistributionTime();
+        bool hasEveryoneContributed = s_cycleContribution == (s_members.length * i_contributionAmount);
+        upkeepNeeded = (isDistributionTime && hasEveryoneContributed);
+        return (upkeepNeeded, "0x0");
+    }
+
+    function performUpkeep(bytes calldata /* performData */ ) external override {
+        (bool upkeepNeeded,) = checkUpkeep("");
+        if (!upkeepNeeded) {
+            revert Committee__UpkeepNotNeeded();
+        }
+        s_lastDistributionTime += i_collectionInterval;
+        s_currentCycle += 1;
+        s_cycleContribution = 0;
+        uint256 totalMembers = s_members.length;
+        uint256 i;
+        for (; i < totalMembers;) {
+            s_cycleDistributionPerMember[s_members[i]] = 0;
+            unchecked {
+                ++i;
+            }
+        }
+
+        address winner;
+        s_cycleDistributionPerMember[winner] = s_cycleContribution;
     }
 }
