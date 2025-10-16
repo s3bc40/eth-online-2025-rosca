@@ -1,50 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 30, 27, 75;
+  --background-start-rgb: 250, 250, 255;
+  --background-end-rgb: 255, 255, 255;
+
+  /* ROSCA Brand Colors - Indigo/Purple/Fuchsia */
+  --color-indigo: 99, 102, 241;
+  --color-purple: 139, 92, 246;
+  --color-fuchsia: 217, 70, 239;
+
+  /* Muted foreground for secondary text */
+  --muted-foreground: 100, 116, 139;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 240, 243, 255;
+    --background-start-rgb: 17, 24, 39;
+    --background-end-rgb: 15, 23, 42;
+    --muted-foreground: 148, 163, 184;
   }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  min-height: 100vh;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.imgDark {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 
-  .imgLight {
-    display: none;
+  .bg-grid-white\/\[0\.05\] {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
-  .imgDark {
-    display: unset;
+
+  .text-muted-foreground {
+    color: rgb(var(--muted-foreground));
   }
+
+  .bg-gradient-brand {
+    background: linear-gradient(
+      to right,
+      rgb(var(--color-indigo)),
+      rgb(var(--color-purple)),
+      rgb(var(--color-fuchsia))
+    );
+  }
+
+  .text-gradient-brand {
+    background: linear-gradient(
+      to right,
+      rgb(var(--color-indigo)),
+      rgb(var(--color-purple)),
+      rgb(var(--color-fuchsia))
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-100 dark:border-slate-700 hover:shadow-xl transition-all duration-300;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 hover:from-indigo-700 hover:via-purple-700 hover:to-fuchsia-700 dark:from-indigo-500 dark:via-purple-500 dark:to-fuchsia-500 dark:hover:from-indigo-600 dark:hover:via-purple-600 dark:hover:to-fuchsia-600 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl transform hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 dark:from-secondary-600 dark:to-secondary-700 dark:hover:from-secondary-700 dark:hover:to-secondary-800 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl transform hover:-translate-y-0.5;
+  }
+
+  .btn-success {
+    @apply bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 dark:from-accent-500 dark:to-accent-600 dark:hover:from-accent-600 dark:hover:to-accent-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl transform hover:-translate-y-0.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium shadow-sm;
+  }
+}
+
+/* Custom animations */
+@keyframes pulse-subtle {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4);
+  }
+  50% {
+    opacity: 0.95;
+    box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
