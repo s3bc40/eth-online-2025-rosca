@@ -1,0 +1,12 @@
+{
+  "name": "anvil-states",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "anvil:safes": "anvil --load-state anvil-safe-smart-accounts.json --block-time 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

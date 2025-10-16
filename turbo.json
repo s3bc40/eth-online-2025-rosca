@@ -18,8 +18,11 @@
       "persistent": true
     },
     "codegen": {
-      "dependsOn": ["^codegen"],
       "cache": false
+    },
+    "anvil:safes": {
+      "cache": false,
+      "persistent": true
     }
   }
 }
