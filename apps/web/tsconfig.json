@@ -5,7 +5,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "resolveJsonModule": true
   },
   "include": [
     "**/*.ts",

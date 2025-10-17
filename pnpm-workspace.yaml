@@ -2,3 +2,4 @@ packages:
   - "apps/*"
   - "packages/*"
   - "apps/envio-indexer/generated" # Include generated code for TypeScript path mapping
+  - "!packages/safe-smart-account" # Exclude safe-smart-account package (development only)
