@@ -1,12 +1,12 @@
 {
-  "name": "anvil-states",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@repo/anvil-states",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "anvil:safes": "anvil --load-state anvil-safe-smart-accounts.json --block-time 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }
