@@ -5,6 +5,12 @@
       "rev": "c6d0ca512f1b09d93bc81415d246dbee7e5c6894"
     }
   },
+  "lib/chainlink-evm": {
+    "tag": {
+      "name": "v0.3.3",
+      "rev": "793106cd598da8b2762958880300787b0b361fa1"
+    }
+  },
   "lib/forge-std": {
     "tag": {
       "name": "v1.11.0",
