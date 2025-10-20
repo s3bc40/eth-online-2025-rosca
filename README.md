@@ -153,6 +153,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 Thanks to everyone who has contributed to ETHOnline 2025!
 
-<a href="https://github.com/s3bc40/msig-ui/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=s3bc40/msig-ui" />
+<a href="https://github.com/s3bc40/eth-online-2025-rosca/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=s3bc40/eth-online-2025-rosca" />
 </a>

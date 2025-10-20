@@ -1,8 +1,9 @@
 "use client";
 
 // import { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
 // import useSafeProtocolKit from "../../hooks/useSafeProtocolKit";
+import { Text } from "../../common/Title";
+import Navbar from "../../components/Navbar";
 
 export default function RoscaList() {
   // // ------------ TO REMOVE ------------
@@ -35,6 +36,12 @@ export default function RoscaList() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
         <h1 className="text-3xl font-bold text-gray-800">Rosca List</h1>
         <p className="mt-4 text-gray-600">Here are your Rosca groups.</p>
+        <Text text="Rosca List" type="h1" />
+        <Text text="Rosca List" type="h2" />
+        <Text text="Rosca List" type="h3" />
+        <Text text="Rosca List" type="label" />
+        <Text text="Rosca List" type="pxs" />
+        <Text text="Rosca List" type="psm" />
         {/* // ------------ TO REMOVE ------------ */}
         {/* <p className="mt-10 text-orange-800">TEST SAFE KIT</p> */}
         {/* <p className="mt-4 text-orange-600">{safeAddress}</p> */}
