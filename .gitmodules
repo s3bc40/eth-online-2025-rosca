@@ -10,3 +10,6 @@
 [submodule "apps/foundry/lib/chainlink-evm"]
 	path = apps/foundry/lib/chainlink-evm
 	url = https://github.com/smartcontractkit/chainlink-evm
+[submodule "packages/safe-smart-account"]
+	path = packages/safe-smart-account
+	url = https://github.com/safe-global/safe-smart-account.git

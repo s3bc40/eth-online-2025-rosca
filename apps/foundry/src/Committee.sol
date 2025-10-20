@@ -158,7 +158,7 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
      * @param _entropyFeePercentage Percentage (0-100) of ETH to keep for Entropy fees
      * @dev Remaining ETH is converted to LINK for automation funding
      */
-    function fundAutomation(uint256 _entropyFeePercentage) external payable {
+    /*function fundAutomation(uint256 _entropyFeePercentage) external payable {
         if (msg.value == 0) {
             revert Committee__InsufficientFunding();
         }
@@ -185,7 +185,7 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
         }
 
         emit FundsDeposited(msg.sender, msg.value, entropyAmount, linkEthAmount);
-    }
+    }*/
 
     /**
      * @notice Alternative funding method - deposit LINK directly
@@ -214,7 +214,7 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
      * @param _ethAmount Amount of ETH to swap
      * @return linkAmount Amount of LINK received
      */
-    function _swapEthForLink(uint256 _ethAmount) private returns (uint256 linkAmount) {
+    /*function _swapEthForLink(uint256 _ethAmount) private returns (uint256 linkAmount) {
         if (_ethAmount == 0) return 0;
 
         address[] memory path = new address[](2);
@@ -235,7 +235,7 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
 
         linkAmount = amounts[1];
         return linkAmount;
-    }
+    }*/
 
     /**
      * @notice Registers a new Chainlink Automation upkeep
