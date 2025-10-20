@@ -1,3 +1,6 @@
 [submodule "apps/foundry/lib/forge-std"]
 	path = apps/foundry/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "packages/safe-smart-account"]
+	path = packages/safe-smart-account
+	url = https://github.com/safe-global/safe-smart-account.git

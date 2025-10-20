@@ -9,7 +9,8 @@
     "check-types": "turbo run check-types",
     "envio:dev": "turbo run envio-indexer#dev",
     "envio:codegen": "turbo run envio-indexer#codegen",
-    "forge:build": "turbo run foundry#build"
+    "forge:build": "turbo run foundry#build",
+    "anvil:safes": "turbo run anvil:safes"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
