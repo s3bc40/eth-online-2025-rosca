@@ -157,7 +157,11 @@ importers:
         specifier: 17.7.2
         version: 17.7.2
 
-  apps/foundry: {}
+  apps/foundry:
+    dependencies:
+      '@pythnetwork/entropy-sdk-solidity':
+        specifier: ^2.0.0
+        version: 2.1.0
 
   apps/web:
     dependencies:
@@ -872,6 +876,9 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
+
+  '@pythnetwork/entropy-sdk-solidity@2.1.0':
+    resolution: {integrity: sha512-V6Xjrvr1/5rURA1A4YikwRGSpva0irKETTeUD3iP0KYuZUaS1K3TadMj2onPyxnMiMjaGorC6THQH+AGfFwcWQ==}
 
   '@rainbow-me/rainbowkit@2.2.8':
     resolution: {integrity: sha512-EdNIK2cdAT6GJ9G11wx7nCVfjqBfxh7dx/1DhPYrB+yg+VFrII6cM1PiMFVC9evD4mqVHe9mmLAt3nvlwDdiPQ==}
@@ -4867,6 +4874,8 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@pythnetwork/entropy-sdk-solidity@2.1.0': {}
 
   '@rainbow-me/rainbowkit@2.2.8(@tanstack/react-query@5.90.2(react@19.2.0))(@types/react@19.1.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2)(viem@2.21.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.12))(wagmi@2.18.0(@tanstack/query-core@5.90.2)(@tanstack/react-query@5.90.2(react@19.2.0))(@types/react@19.1.0)(bufferutil@4.0.9)(react@19.2.0)(typescript@5.9.2)(utf-8-validate@5.0.10)(viem@2.21.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.12))(zod@4.1.12))':
     dependencies:
