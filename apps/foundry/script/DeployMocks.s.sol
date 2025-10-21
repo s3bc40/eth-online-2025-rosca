@@ -5,7 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {BaseDeployScript} from "./BaseDeployScript.sol";
 import {MockAutomationRegistrar, MockAutomationRegistry} from "../test/Mocks/MockAutomationRegistrarAndRegistry.sol";
 import {MockERC20} from "../test/Mocks/MockERC20.sol";
-import {MockWETH} from "../test/Mocks/MockWETH.sol";
+import {MockWETH} from "../test/Mocks/MockWeth.sol";
 import {MockEntropy} from "../test/Mocks/MockEntropy.sol";
 import {MockUniswapV2Router} from "../test/Mocks/MockUniswapV2Router.sol";
 
