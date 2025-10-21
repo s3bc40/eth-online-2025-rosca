@@ -5,5 +5,17 @@
   "private": true,
   "scripts": {
     "build": "forge build"
+  },
+  "description": "**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pythnetwork/entropy-sdk-solidity": "^2.0.0"
   }
 }
