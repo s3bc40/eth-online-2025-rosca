@@ -9,7 +9,7 @@
 
 
 TARGET_DIR="abis"
-ROOT_DIR="../foundry"
+ROOT_DIR="../../apps/foundry"
 
 echo "--- ABI Synchronization Started ---"
 
@@ -24,7 +24,7 @@ fi
 mkdir -p "$TARGET_DIR"
 
 # Find needed JSON artifact files in the 'out' directories
-FIND_COMMAND="find $ROOT_DIR -type f -path '*/out/*' \( -name 'Factory.json' -o -name 'Committee.json' \) -print0"
+FIND_COMMAND="find $ROOT_DIR -type f -path '*/out/*' \( -name 'Factory.json' -o -name 'Committee.json' -o -name 'MockAutomationRegistrar.json' -o -name 'MockAutomationRegistry.json' -o -name 'MockEntropy.json' \) -print0"
 ARTIFACTS_FOUND=0
 
 # Loop through all found artifact paths

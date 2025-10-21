@@ -3,7 +3,7 @@
 import Navbar from "../../components/Navbar";
 // // ------------ TO REMOVE ------------
 // import { useChainId, useReadContract } from "wagmi";
-// import CommitteeABI from "../../../abis/Committee.json";
+// import CommitteeABI from "@repo/foundry-utils/abis/Committee.json";
 // import { getFactoryContractAddress } from "../../utils/helpers";
 // // ------------ TO REMOVE ------------
 
