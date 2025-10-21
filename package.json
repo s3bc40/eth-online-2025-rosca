@@ -9,7 +9,7 @@
     "check-types": "turbo run check-types",
     "envio:dev": "turbo run envio-indexer#dev",
     "envio:codegen": "turbo run envio-indexer#codegen",
-    "forge:build": "turbo run foundry#build",
+    "forge:compile": "turbo run foundry#compile",
     "anvil:safes": "turbo run anvil:safes"
   },
   "devDependencies": {
