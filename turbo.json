@@ -17,12 +17,11 @@
       "cache": false,
       "persistent": true
     },
-    "codegen": {
+    "forge:compile": {
       "cache": false
     },
-    "anvil:safes": {
-      "cache": false,
-      "persistent": true
+    "codegen": {
+      "cache": false
     }
   }
 }
