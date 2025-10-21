@@ -1,4 +1,7 @@
 {
+  "../../packages/safe-smart-account": {
+    "rev": "21dc82410445637820f600c7399a804ad55841d5"
+  },
   "lib/chainlink-brownie-contracts": {
     "tag": {
       "name": "0.6.1",
