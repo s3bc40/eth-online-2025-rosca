@@ -1,0 +1,116 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_registry",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "registerUpkeep",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "internalType": "struct IAutomationRegistrar.RegistrationParams",
+        "components": [
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "encryptedEmail",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "upkeepContract",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "gasLimit",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "adminAddress",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "triggerType",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "checkData",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "triggerConfig",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "offchainConfig",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "amount",
+            "type": "uint96",
+            "internalType": "uint96"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "registry",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "UpkeepRegistered",
+    "inputs": [
+      {
+        "name": "upkeepId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "upkeepContract",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  }
+]

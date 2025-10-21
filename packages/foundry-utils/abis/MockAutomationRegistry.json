@@ -1,0 +1,233 @@
+[
+  {
+    "type": "function",
+    "name": "addFunds",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint96",
+        "internalType": "uint96"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getUpkeep",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct IAutomationRegistry.UpkeepInfo",
+        "components": [
+          {
+            "name": "target",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "executeGas",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "checkData",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "balance",
+            "type": "uint96",
+            "internalType": "uint96"
+          },
+          {
+            "name": "admin",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "maxValidBlocknumber",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "lastPerformBlockNumber",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "amountSpent",
+            "type": "uint96",
+            "internalType": "uint96"
+          },
+          {
+            "name": "paused",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "offchainConfig",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "performUpkeep",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "performData",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "registerUpkeep",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "admin",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint96",
+        "internalType": "uint96"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "upkeeps",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "executeGas",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "checkData",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "balance",
+        "type": "uint96",
+        "internalType": "uint96"
+      },
+      {
+        "name": "admin",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "maxValidBlocknumber",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "lastPerformBlockNumber",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "amountSpent",
+        "type": "uint96",
+        "internalType": "uint96"
+      },
+      {
+        "name": "paused",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "offchainConfig",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "UpkeepFunded",
+    "inputs": [
+      {
+        "name": "upkeepId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint96",
+        "indexed": false,
+        "internalType": "uint96"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UpkeepPerformed",
+    "inputs": [
+      {
+        "name": "upkeepId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  }
+]
