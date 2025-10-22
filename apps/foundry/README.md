@@ -64,3 +64,13 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+
+---
+
+## How to deploy
+
+```bash
+source .env
+forge script script/DeployMocks.s.sol --broadcast --rpc-url $ANVIL_RPC_URL
+forge script script/DeployAll.s.sol --broadcast --rpc-url $ANVIL_RPC_URL
+```
