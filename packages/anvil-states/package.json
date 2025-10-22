@@ -8,6 +8,6 @@
   },
   "scripts": {
     "init": "anvil --load-state anvil-safe-smart-accounts.json --dump-state anvil-dev-state.json",
-    "dev": "anvil --load-state anvil-dev-state.json --dump-state anvil-dev-state.json"
+    "dev": "anvil --load-state anvil-dev-state.json"
   }
 }
