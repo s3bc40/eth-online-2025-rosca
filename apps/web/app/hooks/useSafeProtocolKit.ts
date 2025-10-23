@@ -21,6 +21,7 @@ import {
   getSignMessageLibDeployment,
   getSimulateTxAccessorDeployment,
 } from "@safe-global/safe-deployments";
+import { waitForTransactionReceipt } from "viem/actions";
 
 const SAFE_VERSION = "1.4.1";
 
@@ -101,7 +102,7 @@ function getContractNetworks(chains: readonly Chain[]) {
  */
 export default function useSafeProtocolKit() {
   // Init wagmi provider and signer here
-  const { address, connector, isConnected } = useAccount();
+  const { address, connector, chain, isConnected } = useAccount();
   const chains = useChains();
 
   // State to hold the Safe Protocol Kit instance
@@ -156,5 +157,79 @@ export default function useSafeProtocolKit() {
     setSafeKit(protocolKit);
   }
 
-  return { safeKit, initSafeProtocolKit };
+  /**
+   * Create Safe wallet on-chain after previous initialization
+   *
+   * @returns The address of the created Safe wallet
+   */
+  async function createSafeWallet(): Promise<string | undefined> {
+    if (!safeKit || !chain) return undefined;
+    const deploymentTx = await safeKit.createSafeDeploymentTransaction();
+    const kitClient = await safeKit.getSafeProvider().getExternalSigner();
+
+    const txHash = await kitClient!.sendTransaction({
+      to: deploymentTx.to as `0x${string}`,
+      value: BigInt(deploymentTx.value),
+      data: deploymentTx.data as `0x${string}`,
+      chain: chain,
+    });
+
+    await waitForTransactionReceipt(kitClient!, {
+      hash: txHash,
+    });
+
+    const safeAddress = await safeKit.getAddress();
+    setSafeKit(
+      await safeKit.connect({
+        safeAddress,
+      })
+    );
+
+    return safeAddress;
+  }
+
+  /**
+   * Connect to an existing Safe wallet
+   *
+   * @param safeAddress - The address of the existing Safe wallet
+   */
+  async function connectSafeWallet(safeAddress: `0x${string}`) {
+    if (!safeKit) return;
+    const connectedSafeKit = await safeKit.connect({
+      safeAddress,
+    });
+
+    if (await connectedSafeKit.isSafeDeployed()) {
+      setSafeKit(connectedSafeKit);
+    }
+  }
+
+  /**
+   * Get the Safe wallet address (predicted or created)
+   *
+   * @returns The address of the Safe wallet
+   */
+  async function getSafeAddress(): Promise<string | undefined> {
+    if (!safeKit) return undefined;
+    return await safeKit.getAddress();
+  }
+
+  /**
+   * Check if the Safe wallet is deployed on-chain
+   *
+   * @returns Boolean indicating if the Safe is deployed
+   */
+  async function isSafeDeployed(): Promise<boolean> {
+    if (!safeKit) return false;
+    return await safeKit.isSafeDeployed();
+  }
+
+  return {
+    safeKit,
+    initSafeProtocolKit,
+    createSafeWallet,
+    connectSafeWallet,
+    getSafeAddress,
+    isSafeDeployed,
+  };
 }
