@@ -52,7 +52,7 @@ function getContractNetworks(chains: readonly Chain[]) {
   // Define contract networks configuration
   const contractNetworks: ContractNetworksConfig = {};
   for (const chain of chains) {
-    if (chain.id === 33137) {
+    if (chain.id === 31337) {
       // Anvil chain ID
       contractNetworks[chain.id] = anvilContractNetworks();
     } else {

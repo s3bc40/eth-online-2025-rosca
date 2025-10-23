@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import {
   useAccount,
@@ -20,7 +20,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Text } from "../../common/Title";
+import useSafeProtocolKit from "../../hooks/useSafeProtocolKit";
 export default function CreateRosca() {
+  // Constants
+  const MINIMAL_MEMBERS = 5;
+  const MEMBERS_SAFE_THRESHOLD = 3;
+
+  // State variables
   const [roscaName, setRoscaName] = useState("");
   const [contribution, setContribution] = useState("");
   const [cycleDuration, setCycleDuration] = useState("");
@@ -35,6 +41,26 @@ export default function CreateRosca() {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+
+  // @DEV -> to remove later, it's an example
+  // SafeKit hook
+  const { initSafeProtocolKit, safeKit } = useSafeProtocolKit();
+
+  useEffect(() => {
+    const actualMembers = members.filter((m) => m.trim() !== "");
+    if (actualMembers.length < MINIMAL_MEMBERS) return;
+    // Initialize Safe Protocol Kit when multiSigAddress or members change
+    const initializeKit = async () => {
+      initSafeProtocolKit(
+        actualMembers as `0x${string}`[],
+        MEMBERS_SAFE_THRESHOLD
+      );
+      setMultiSigAddress((await safeKit?.getAddress()) || "");
+    };
+
+    initializeKit();
+  }, [members, initSafeProtocolKit, safeKit, setMultiSigAddress]);
+  // @DEV -> to remove later, it's an example
 
   // Update member address
   const updateMember = (index: number, value: string) => {
