@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useReadContract } from "wagmi";
+import { useState, useEffect } from "react";
+import { useReadContract, useAccount, useWriteContract } from "wagmi";
 import CommitteeABI from "@repo/foundry-utils/abis/Committee.json";
 import { formatUnits } from "viem";
 import {
@@ -14,15 +14,21 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-
+import ButtonContainer from "../../common/ButtonContainer/index"
 interface RoscaCardProps {
   address: string;
   index: number;
 }
 
 export default function RoscaCard({ address, index }: RoscaCardProps) {
+
+  const {address: userAddress, isConnected } = useAccount();
+  const { writeContract, isPending } = useWriteContract();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMember, setIsMember] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isWinner, setIsWinner] = useState(false);
+  const [canContribute, setCanContribute] = useState(false);
 
   // Read committee details
   const { data: contributionAmount } = useReadContract({
@@ -61,6 +67,22 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     functionName: "i_collectionInterval",
   });
 
+   const { data: memberStatus } = useReadContract({
+    abi: CommitteeABI,
+    address: address as `0x${string}`,
+    functionName: "s_isMember",
+    args: [userAddress],
+    // watch: true,
+  });
+
+  const { data: isWinnerOfCycle } = useReadContract({
+    abi: CommitteeABI,
+    address: address as `0x${string}`,
+    functionName: "", // 
+    args: [address],
+    // watch: true,
+  });
+
   // Calculate progress percentage
   const currentCycleNum = Number(currentCycle || 0);
   const totalCyclesNum = Number(totalCycles || 0);
@@ -87,11 +109,47 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     ? "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
     : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
 
-  const handleCopyAddress = () => {
-    navigator.clipboard.writeText(address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    useEffect(() => {
+      if (memberStatus !== undefined) setIsMember(Boolean(memberStatus));
+      if (isWinnerOfCycle !== undefined) setIsWinner(Boolean(isWinnerOfCycle));
+      // if (currentCycle < totalCycles) setCanContribute(true); it's not implanted for now
+      setCanContribute(true)
+    }, [memberStatus, isWinnerOfCycle]);
+
+    const handleCopyAddress = () => {
+      navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleDeposit = async () => {
+      if (!isConnected || !isMember || !canContribute || isPending) return alert("You must be a member!");
+      try {
+        await writeContract({
+          abi: CommitteeABI,
+          address: address as `0x${string}`,
+          functionName: "depositContribution",
+          args: [contributionAmount],
+        });
+      } catch (err) {
+        console.error(err);
+        alert("Deposit failed.");
+      }
+    };
+
+    const handleWithdraw = async () => {
+      if (!isConnected || !isWinner) return alert("You’re not the winner.");
+      try {
+        await writeContract({
+          abi: CommitteeABI,
+          address: address as `0x${string}`,
+          functionName: "withdrawYourShare",
+        });
+      } catch (err) {
+        console.error(err);
+        alert("Withdraw failed.");
+      }
+    };
 
   return (
     <div className="card group hover:scale-105 transition-transform duration-300">
@@ -168,6 +226,36 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
             style={{ width: `${progress}%` }}
           />
         </div>
+      </div>
+
+     {/* Deposit and Withdraw */}
+      <div className="flex flex-col gap-3 mt-4">
+        {/* Deposit Button */}
+        <button
+          onClick={handleDeposit}
+          // disabled={!canContribute || !isMember || isPending}
+          className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200
+            ${isPending
+              ? "bg-gray-300 dark:bg-slate-700 text-gray-500 cursor-not-allowed"
+              : "bg-gradient-to-r from-primary-500 via-secondary-500 to-accent-500 text-white hover:opacity-90 shadow-md"
+            }`}
+        >
+          {isPending ? "Processing..." : "Deposit Contribution"}
+        </button>
+
+        {isWinner && (
+          <button
+            onClick={handleWithdraw}
+            disabled={isPending}
+            className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200
+              border border-secondary-300 dark:border-secondary-700
+              text-secondary-700 dark:text-secondary-300
+              hover:bg-secondary-100 dark:hover:bg-secondary-900/30
+              shadow-sm`}
+          >
+            {isPending ? "Processing..." : "Withdraw Your Share"}
+          </button>
+        )}
       </div>
 
       {/* Quick Stats */}
