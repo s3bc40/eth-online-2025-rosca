@@ -21,7 +21,7 @@ abstract contract BaseDeployScript is Script {
         address registry;
         address uniswapRouter;
         address weth;
-        uint256 maxCommitteeMembers;
+        uint8 maxCommitteeMembers;
     }
 
     struct DeploymentConfig {

@@ -1,0 +1,74 @@
+{
+    "Committee": {
+        "runtime_size": 16698,
+        "init_size": 19361,
+        "runtime_margin": 7878,
+        "init_margin": 29791
+    },
+    "CommitteeState": {
+        "runtime_size": 13077,
+        "init_size": 13672,
+        "runtime_margin": 11499,
+        "init_margin": 35480
+    },
+    "EntropyStructs": {
+        "runtime_size": 62,
+        "init_size": 88,
+        "runtime_margin": 24514,
+        "init_margin": 49064
+    },
+    "EntropyStructsV2": {
+        "runtime_size": 62,
+        "init_size": 88,
+        "runtime_margin": 24514,
+        "init_margin": 49064
+    },
+    "Factory": {
+        "runtime_size": 25266,
+        "init_size": 26551,
+        "runtime_margin": -690,
+        "init_margin": 22601
+    },
+    "FactoryState": {
+        "runtime_size": 1138,
+        "init_size": 1167,
+        "runtime_margin": 23438,
+        "init_margin": 47985
+    },
+    "MockAutomationRegistrar": {
+        "runtime_size": 1409,
+        "init_size": 1688,
+        "runtime_margin": 23167,
+        "init_margin": 47464
+    },
+    "MockAutomationRegistry": {
+        "runtime_size": 6285,
+        "init_size": 6314,
+        "runtime_margin": 18291,
+        "init_margin": 42838
+    },
+    "MockERC20": {
+        "runtime_size": 3953,
+        "init_size": 5490,
+        "runtime_margin": 20623,
+        "init_margin": 43662
+    },
+    "MockEntropy": {
+        "runtime_size": 5307,
+        "init_size": 5400,
+        "runtime_margin": 19269,
+        "init_margin": 43752
+    },
+    "MockUniswapV2Router": {
+        "runtime_size": 2633,
+        "init_size": 2662,
+        "runtime_margin": 21943,
+        "init_margin": 46490
+    },
+    "MockWETH": {
+        "runtime_size": 4427,
+        "init_size": 5450,
+        "runtime_margin": 20149,
+        "init_margin": 43702
+    }
+}
