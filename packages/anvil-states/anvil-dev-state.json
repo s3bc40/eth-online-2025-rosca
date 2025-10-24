@@ -1554,7 +1554,8 @@
                   "data": "0x"
                 },
                 "decoded": { "name": null, "params": null },
-                "position": 0
+                "position": 0,
+                "index": 0
               }
             ],
             "ordering": [{ "Log": 0 }]
@@ -1631,7 +1632,8 @@
                   "data": "0x00000000000000000000000000000000000000000000021e19e0c9bab2400000"
                 },
                 "decoded": { "name": null, "params": null },
-                "position": 0
+                "position": 0,
+                "index": 0
               }
             ],
             "ordering": [{ "Log": 0 }]
@@ -2014,7 +2016,8 @@
                   "data": "0x000000000000000000000000000000000000000000000000000000e8d4a51000"
                 },
                 "decoded": { "name": null, "params": null },
-                "position": 0
+                "position": 0,
+                "index": 0
               }
             ],
             "ordering": [{ "Log": 0 }]
@@ -2145,7 +2148,8 @@
                   "data": "0x"
                 },
                 "decoded": { "name": null, "params": null },
-                "position": 1
+                "position": 1,
+                "index": 0
               }
             ],
             "ordering": [{ "Call": 0 }, { "Log": 0 }]
@@ -2188,7 +2192,8 @@
                   "data": "0x"
                 },
                 "decoded": { "name": null, "params": null },
-                "position": 0
+                "position": 0,
+                "index": 0
               }
             ],
             "ordering": [{ "Log": 0 }]
@@ -2412,7 +2417,8 @@
                   "data": "0x00000000000000000000000000000000000000000000d3c21bcecceda1000000"
                 },
                 "decoded": { "name": null, "params": null },
-                "position": 0
+                "position": 0,
+                "index": 0
               }
             ],
             "ordering": [{ "Log": 0 }]
