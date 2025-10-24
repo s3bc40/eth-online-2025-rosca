@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
+import SafeSetupPage from "../../components/MultisigWallet/MultisigWallet"
 import {
   useAccount,
   useChainId,
@@ -33,6 +34,8 @@ export default function CreateRosca() {
   const [requiredSignatures, setRequiredSignatures] = useState("");
   const [members, setMembers] = useState([""]);
   const [multiSigAddress, setMultiSigAddress] = useState("");
+  const [open, setOpen] = useState(false);
+
 
   // Wagmi hooks
   const chainId = useChainId();
@@ -231,24 +234,41 @@ export default function CreateRosca() {
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <label
-                      htmlFor="multiSigAddress"
-                      className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1"
-                    >
-                      Multi-Sig Account Address *
-                    </label>
-                    <input
-                      type="text"
-                      id="multiSigAddress"
-                      name="multiSigAddress"
-                      required
-                      value={multiSigAddress}
-                      onChange={(e) => setMultiSigAddress(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono"
-                      placeholder="0x..."
-                    />
+                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                      Multi-Sig Account Address
+                    </p>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 font-mono break-all">
+                      {multiSigAddress ? multiSigAddress : "No Safe connected yet"}
+                    </div>
                   </div>
+
+                  <button
+                    onClick={() => setOpen(true)}
+                    className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition"
+                  >
+                    {multiSigAddress ? "Change Safe" : "Setup / Connect Safe"}
+                  </button>
+
+                  {open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-lg w-full relative">
+                        <button
+                          onClick={() => setOpen(false)}
+                          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200"
+                        >
+                          ✕
+                        </button>
+                        <SafeSetupPage
+                          onSafeConnected={(addr) => {
+                            setMultiSigAddress(addr);
+                            setOpen(false);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
+                
               </div>
 
               {/* Members */}
