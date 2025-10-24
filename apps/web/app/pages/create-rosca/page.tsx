@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { Text } from "../../common/Title";
 import useSafeProtocolKit from "../../hooks/useSafeProtocolKit";
+import { useMultisigAddresses } from "../../hooks/useMultisigAddresses";
 export default function CreateRosca() {
   // Constants
   const MINIMAL_MEMBERS = 5;
@@ -61,6 +62,9 @@ export default function CreateRosca() {
     initializeKit();
   }, [members, initSafeProtocolKit, safeKit, setMultiSigAddress]);
   // @DEV -> to remove later, it's an example
+
+  // Multisig addresses hook
+  const { addAddressLocalStorage } = useMultisigAddresses();
 
   // Update member address
   const updateMember = (index: number, value: string) => {
@@ -121,6 +125,8 @@ export default function CreateRosca() {
           multiSigAddress as `0x${string}`,
         ],
       });
+      // Store the multisig address locally
+      addAddressLocalStorage(multiSigAddress);
     } catch (err) {
       console.error("Error creating ROSCA:", err);
       alert("Failed to create ROSCA");
