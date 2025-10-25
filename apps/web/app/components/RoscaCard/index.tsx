@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useReadContract, useAccount, useWriteContract, useWatchContractEvent } from "wagmi";
 import CommitteeABI from "@repo/foundry-utils/abis/Committee.json";
 import { formatUnits } from "viem";
+import { ethers } from "ethers";
 import {
   Users,
   DollarSign,
@@ -75,37 +76,27 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
   //   // watch: true,
   // });
 
+
   useWatchContractEvent({
-  address: address as `0x${string}`,
-  abi: CommitteeABI,
-  eventName: "WinnerPicked",
-  onEvent(event) {
-    const winner = event.args.winner;
+    address: address as `0x${string}`,
+    abi: CommitteeABI,
+    eventName: "WinnerPicked",
+    onLogs(logs) {
+      const iface = new ethers.utils.Interface(CommitteeABI);
 
-    if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
-      setIsWinner(true);
-    } else {
-      setIsWinner(false);
-    }
-  },
-});
-  // useWatchContractEvent({
-  //   address: address as `0x${string}`,
-  //   abi: CommitteeABI,
-  //   eventName: "WinnerPicked",
-  //   onLogs(logs) {
-  //     logs.forEach((log) => {
-
-  //       const winner = log.args.winner
-  //       if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
-  //         setIsWinner(true)
-  //       } else {
-  //       setIsWinner(false);
-  //     }
+      logs.forEach((log) => {
+        const decoded = iface.parseLog(log);
+        const winner = decoded.args.winner;
+        
+        if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
+          setIsWinner(true)
+        } else {
+        setIsWinner(false);
+      }
       
-  //     })
-  //   },
-  // });
+      })
+    },
+  });
 
   const { data: isWinnerOfCycle } = useReadContract({
     abi: CommitteeABI,
