@@ -163,6 +163,8 @@ export default function useSafeProtocolKit() {
    * @returns The address of the created Safe wallet
    */
   async function createSafeWallet(): Promise<string | undefined> {
+    console.log("Using contract addresses:", getContractNetworks(chains)[chain.id]);
+
     if (!safeKit || !chain) return undefined;
     const deploymentTx = await safeKit.createSafeDeploymentTransaction();
     const kitClient = await safeKit.getSafeProvider().getExternalSigner();

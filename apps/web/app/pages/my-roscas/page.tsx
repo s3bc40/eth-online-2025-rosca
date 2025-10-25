@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Navbar from "../../components/Navbar";
-import { useAccount, useChainId, useReadContract } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import FactoryABI from "@repo/foundry-utils/abis/Factory.json";
 import { getFactoryContractAddress } from "../../utils/helpers";
 import { ArrowLeft, Users, Search, Filter } from "lucide-react";
 import Link from "next/link";
 import RoscaCard from "../../components/RoscaCard";
+import { useMultisigAddresses } from "../../hooks/useMultisigAddresses";
+import { readContract } from "wagmi/actions";
+import { config } from "../../wagmiConfig";
 
 export default function MyRoscas() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,20 +21,49 @@ export default function MyRoscas() {
   const { address } = useAccount();
   const chainId = useChainId();
   const factoryAddress = getFactoryContractAddress(chainId);
+  const { getAddressesLocalStorage } = useMultisigAddresses();
 
-  // Get all committees for the connected wallet address
-  const {
-    data: committees,
-    isLoading,
-    error,
-  } = useReadContract({
-    address: factoryAddress,
-    abi: FactoryABI,
-    functionName: "getCommittees",
-    args: address ? [address] : undefined,
-  });
+  const [committees, setCommittees] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const committeeAddresses = (committees as string[]) || [];
+  useEffect(() => {
+    const fetchCommittees = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const addresses = getAddressesLocalStorage();
+        if (!addresses.length || !factoryAddress) {
+          setCommittees([]);
+          setIsLoading(false);
+          return;
+        }
+        // Fetch committees for each multisig address
+        const results = await Promise.all(
+          addresses.map(async (addr) => {
+            const data = await readContract(config, {
+              address: factoryAddress,
+              abi: FactoryABI,
+              functionName: "getCommittees",
+              args: [addr],
+            });
+            return data as string[];
+          })
+        );
+        // Flatten and deduplicate
+        setCommittees([...new Set(results.flat())]);
+      } catch (err) {
+        setError(err as Error);
+      }
+      setIsLoading(false);
+    };
+    fetchCommittees();
+  }, [factoryAddress, getAddressesLocalStorage]);
+
+  const committeeAddresses = useMemo(
+    () => (committees as string[]) || [],
+    [committees]
+  );
 
   // Filter committees based on search term
   const filteredCommittees = useMemo(() => {
