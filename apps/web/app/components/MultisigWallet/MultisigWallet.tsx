@@ -3,20 +3,12 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import useSafeProtocolKit from "../../hooks/useSafeProtocolKit";
-import {
-  PlusCircle,
-  Trash2,
-} from "lucide-react";
+import { PlusCircle, Trash2 } from "lucide-react";
 
 export default function SafeSetupPage({ onSafeConnected }) {
   const { address } = useAccount();
-  const {
-    initSafeProtocolKit,
-    createSafeWallet,
-    connectSafeWallet,
-    getSafeAddress,
-    isSafeDeployed,
-  } = useSafeProtocolKit();
+  const { createSafeWallet, connectSafeWallet, isSafeDeployed } =
+    useSafeProtocolKit();
 
   const [owners, setOwners] = useState<string[]>([]);
   const [threshold, setThreshold] = useState(1);
@@ -24,52 +16,56 @@ export default function SafeSetupPage({ onSafeConnected }) {
   const [loading, setLoading] = useState(false);
 
   async function handleCreateSafe() {
-  
     setLoading(true);
-    await initSafeProtocolKit([address!, ...owners], threshold);
-    const newSafeAddress = await createSafeWallet();
-    if (newSafeAddress) onSafeConnected(newSafeAddress);
+    // Combine the connected address and user-entered owners, then deduplicate
+    const allOwners = [address!, ...owners];
+    const uniqueOwners = Array.from(
+      new Set(allOwners.map((a) => a.toLowerCase()))
+    );
+    const safeAddress = await createSafeWallet(
+      uniqueOwners as `0x${string}`[],
+      threshold
+    );
+    if (safeAddress) onSafeConnected(safeAddress);
     setLoading(false);
   }
 
   async function handleConnectSafe() {
     setLoading(true);
-    await initSafeProtocolKit([address!], 1);
-    await connectSafeWallet(existingSafe as `0x${string}`);
-    const deployed = await isSafeDeployed();
+    const safeKit = await connectSafeWallet(existingSafe as `0x${string}`);
+    const deployed = await isSafeDeployed(safeKit!);
     if (deployed) onSafeConnected(existingSafe);
     setLoading(false);
   }
 
   const addOwner = () => {
-      setOwners([...owners, ""]);
-    };
+    setOwners([...owners, ""]);
+  };
 
-    const updateOwner = (index: number, value: string) => {
-      const updated = [...owners];
-      updated[index] = value;
-      setOwners(updated);
-    };
+  const updateOwner = (index: number, value: string) => {
+    const updated = [...owners];
+    updated[index] = value;
+    setOwners(updated);
+  };
 
-    const deleteOwner = (index: number) => {
-      const updated = [...owners];
-      updated.splice(index, 1);
-      setOwners(updated);
-    };
+  const deleteOwner = (index: number) => {
+    const updated = [...owners];
+    updated.splice(index, 1);
+    setOwners(updated);
+  };
 
+  // const handleCreateSafe = async () => {
+  //   if (threshold > owners.length) {
+  //     alert("Threshold cannot be greater than number of owners");
+  //     return;
+  //   }
 
-    // const handleCreateSafe = async () => {
-    //   if (threshold > owners.length) {
-    //     alert("Threshold cannot be greater than number of owners");
-    //     return;
-    //   }
+  //   console.log("Owners:", owners);
+  //   console.log("Threshold:", threshold);
 
-    //   console.log("Owners:", owners);
-    //   console.log("Threshold:", threshold);
-
-    //   // Example:
-    //   await contract.createSafe(owners, threshold);
-    // };
+  //   // Example:
+  //   await contract.createSafe(owners, threshold);
+  // };
 
   return (
     <div className="flex flex-col gap-4">
