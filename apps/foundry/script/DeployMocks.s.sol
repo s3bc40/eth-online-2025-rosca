@@ -7,7 +7,6 @@ import {MockAutomationRegistrar, MockAutomationRegistry} from "../test/Mocks/Moc
 import {MockERC20} from "../test/Mocks/MockERC20.sol";
 import {MockWETH} from "../test/Mocks/MockWeth.sol";
 import {MockEntropy} from "../test/Mocks/MockEntropy.sol";
-import {MockUniswapV2Router} from "../test/Mocks/MockUniswapV2Router.sol";
 
 /**
  * @title DeployMocks
@@ -21,7 +20,6 @@ contract DeployMocks is BaseDeployScript {
     MockEntropy public entropy;
     MockAutomationRegistry public registry;
     MockAutomationRegistrar public registrar;
-    MockUniswapV2Router public uniswapRouter;
 
     function run() public override broadcast {
         setUp();
@@ -71,11 +69,6 @@ contract DeployMocks is BaseDeployScript {
         registrar = new MockAutomationRegistrar(address(registry));
         console.log("   Registrar:", address(registrar));
 
-        // Deploy Uniswap Router
-        console.log("7. Deploying Mock Uniswap V2 Router...");
-        uniswapRouter = new MockUniswapV2Router();
-        console.log("   Uniswap Router:", address(uniswapRouter));
-
         console.log("");
     }
 
@@ -91,10 +84,6 @@ contract DeployMocks is BaseDeployScript {
         uint256 linkAmount = 10_000 * 1e18; // 10K LINK
         link.mint(config.deployer, linkAmount);
         console.log("Minted", linkAmount / 1e18, "LINK to deployer");
-
-        // Mint LINK to router for swaps
-        link.mint(address(uniswapRouter), 1_000_000 * 1e18);
-        console.log("Minted 1M LINK to Uniswap Router for swaps");
 
         console.log("");
     }
@@ -114,7 +103,6 @@ contract DeployMocks is BaseDeployScript {
         console.log("Entropy:", address(entropy));
         console.log("Registry:", address(registry));
         console.log("Registrar:", address(registrar));
-        console.log("Uniswap Router:", address(uniswapRouter));
         console.log("===========================================\n");
 
         console.log("Environment Variables for .env:");
@@ -124,7 +112,6 @@ contract DeployMocks is BaseDeployScript {
         console.log("LINK_ADDRESS=", vm.toString(address(link)));
         console.log("REGISTRAR_ADDRESS=", vm.toString(address(registrar)));
         console.log("REGISTRY_ADDRESS=", vm.toString(address(registry)));
-        console.log("UNISWAP_ROUTER_ADDRESS=", vm.toString(address(uniswapRouter)));
         console.log("WETH_ADDRESS=", vm.toString(address(weth)));
         console.log("===========================================\n");
     }
@@ -136,6 +123,5 @@ contract DeployMocks is BaseDeployScript {
         saveDeployment("MockEntropy", address(entropy));
         saveDeployment("MockRegistry", address(registry));
         saveDeployment("MockRegistrar", address(registrar));
-        saveDeployment("MockUniswapRouter", address(uniswapRouter));
     }
 }

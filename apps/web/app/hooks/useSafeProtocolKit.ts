@@ -105,9 +105,6 @@ export default function useSafeProtocolKit() {
   const { address, connector, chain, isConnected } = useAccount();
   const chains = useChains();
 
-  // State to hold the Safe Protocol Kit instance
-  const [safeKit, setSafeKit] = useState<Safe | null>(null);
-
   /**
    * Initialize Safe Protocol Kit from owners and threshold
    *
@@ -117,8 +114,8 @@ export default function useSafeProtocolKit() {
    * Set the Safe Protocol Kit instance in state
    */
   async function initSafeProtocolKit(
-    owners: `0x${string}`[],
-    threshold: number
+    owners?: `0x${string}`[],
+    threshold?: number
   ) {
     if (!isConnected) return;
     const provider = await connector?.getProvider();
@@ -128,33 +125,46 @@ export default function useSafeProtocolKit() {
       throw new Error("Provider not available");
     }
 
-    // Setup Safe account configuration
-    const safeAccountConfig: SafeAccountConfig = {
-      owners,
-      threshold,
-    };
+    let protocolKit;
 
-    // Define deployment configuration (ensure safe version 1.4.1)
-    const safeDeploymentConfig: SafeDeploymentConfig = {
-      safeVersion: "1.4.1",
-      deploymentType: "canonical",
-    };
+    if (owners != undefined && threshold != undefined) {
+      // Setup Safe account configuration
+      const safeAccountConfig: SafeAccountConfig = {
+        owners,
+        threshold,
+      };
 
-    // Init predicted safe props
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig,
-      safeDeploymentConfig,
-    };
+      // Define deployment configuration (ensure safe version 1.4.1)
+      const safeDeploymentConfig: SafeDeploymentConfig = {
+        safeVersion: SAFE_VERSION,
+      };
 
-    // Get protocol kit instance
-    const protocolKit = await Safe.init({
-      provider: provider as Eip1193Provider, // force Wagmi provider type
-      signer,
-      predictedSafe,
-      contractNetworks: getContractNetworks(chains),
-    });
+      // Init predicted safe props
+      const predictedSafe: PredictedSafeProps = {
+        safeAccountConfig,
+        safeDeploymentConfig,
+      };
 
-    setSafeKit(protocolKit);
+      // Get protocol kit instance
+      protocolKit = await Safe.init({
+        provider: provider as Eip1193Provider, // force Wagmi provider type
+        signer,
+        predictedSafe,
+        contractNetworks: getContractNetworks(chains),
+      });
+    } else {
+      // Init config to connect to existing Safe without owners and threshold
+      protocolKit = await Safe.init({
+        provider: provider as Eip1193Provider, // force Wagmi provider type
+        signer,
+        contractNetworks: getContractNetworks(chains),
+        predictedSafe: {
+          safeAccountConfig: { owners: [], threshold: 0 },
+        },
+      });
+    }
+
+    return protocolKit;
   }
 
   /**
@@ -162,30 +172,40 @@ export default function useSafeProtocolKit() {
    *
    * @returns The address of the created Safe wallet
    */
-  async function createSafeWallet(): Promise<string | undefined> {
-    if (!safeKit || !chain) return undefined;
-    const deploymentTx = await safeKit.createSafeDeploymentTransaction();
-    const kitClient = await safeKit.getSafeProvider().getExternalSigner();
+  async function createSafeWallet(
+    owners: `0x${string}`[],
+    threshold: number
+  ): Promise<string | undefined> {
+    if (!chain) return undefined;
+    const safeKit = await initSafeProtocolKit(owners, threshold);
+    if (!safeKit) return undefined;
 
-    const txHash = await kitClient!.sendTransaction({
-      to: deploymentTx.to as `0x${string}`,
-      value: BigInt(deploymentTx.value),
-      data: deploymentTx.data as `0x${string}`,
-      chain: chain,
-    });
+    try {
+      const deploymentTx = await safeKit.createSafeDeploymentTransaction();
+      const kitClient = await safeKit.getSafeProvider().getExternalSigner();
 
-    await waitForTransactionReceipt(kitClient!, {
-      hash: txHash,
-    });
+      const txHash = await kitClient!.sendTransaction({
+        to: deploymentTx.to as `0x${string}`,
+        value: BigInt(deploymentTx.value),
+        data: deploymentTx.data as `0x${string}`,
+        chain: chain,
+      });
 
-    const safeAddress = await safeKit.getAddress();
-    setSafeKit(
-      await safeKit.connect({
-        safeAddress,
-      })
-    );
+      console.log("Deployment transaction sent. Hash:", txHash);
+      await waitForTransactionReceipt(kitClient!, {
+        hash: txHash,
+      });
 
-    return safeAddress;
+      const safeAddress = await safeKit.getAddress();
+      console.log("Safe wallet created at address:", safeAddress);
+      console.log("Is Safe deployed:", await safeKit.isSafeDeployed());
+      await safeKit.connect({ safeAddress });
+
+      return safeAddress;
+    } catch (error) {
+      console.error("Error creating Safe wallet:", error);
+      return undefined;
+    }
   }
 
   /**
@@ -194,14 +214,14 @@ export default function useSafeProtocolKit() {
    * @param safeAddress - The address of the existing Safe wallet
    */
   async function connectSafeWallet(safeAddress: `0x${string}`) {
+    const safeKit = await initSafeProtocolKit();
     if (!safeKit) return;
     const connectedSafeKit = await safeKit.connect({
       safeAddress,
     });
 
-    if (await connectedSafeKit.isSafeDeployed()) {
-      setSafeKit(connectedSafeKit);
-    }
+    await connectedSafeKit.isSafeDeployed();
+    return connectedSafeKit;
   }
 
   /**
@@ -209,7 +229,7 @@ export default function useSafeProtocolKit() {
    *
    * @returns The address of the Safe wallet
    */
-  async function getSafeAddress(): Promise<string | undefined> {
+  async function getSafeAddress(safeKit: Safe): Promise<string | undefined> {
     if (!safeKit) return undefined;
     return await safeKit.getAddress();
   }
@@ -219,13 +239,12 @@ export default function useSafeProtocolKit() {
    *
    * @returns Boolean indicating if the Safe is deployed
    */
-  async function isSafeDeployed(): Promise<boolean> {
+  async function isSafeDeployed(safeKit: Safe): Promise<boolean> {
     if (!safeKit) return false;
     return await safeKit.isSafeDeployed();
   }
 
   return {
-    safeKit,
     initSafeProtocolKit,
     createSafeWallet,
     connectSafeWallet,

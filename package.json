@@ -2,9 +2,9 @@
   "name": "eth-online-2025-rosca",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=!envio-indexer",
     "dev": "turbo run dev --filter=!envio-indexer",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint --filter=!envio-indexer",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "envio:dev": "turbo run envio-indexer#dev",

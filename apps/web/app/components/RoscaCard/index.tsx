@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { useReadContract, useAccount, useWriteContract, useWatchContractEvent } from "wagmi";
+=======
+import {
+  useReadContract,
+  useAccount,
+  useWriteContract,
+  useChainId,
+} from "wagmi";
+>>>>>>> origin/main
 import CommitteeABI from "@repo/foundry-utils/abis/Committee.json";
 import { formatUnits } from "viem";
 import { ethers } from "ethers";
@@ -14,22 +23,46 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
+  User,
 } from "lucide-react";
+<<<<<<< HEAD
+=======
+import ButtonContainer from "../../common/ButtonContainer/index";
+>>>>>>> origin/main
 
 interface RoscaCardProps {
   address: string;
   index: number;
 }
 
-export default function RoscaCard({ address, index }: RoscaCardProps) {
+// Helper function to get block explorer URL based on chain ID
+const getBlockExplorerUrl = (chainId: number, address: string): string => {
+  switch (chainId) {
+    case 1: // Ethereum Mainnet
+      return `https://etherscan.io/address/${address}`;
+    case 11155111: // Sepolia
+      return `https://sepolia.etherscan.io/address/${address}`;
+    case 421614: // Arbitrum Sepolia
+      return `https://sepolia.arbiscan.io/address/${address}`;
+    case 42161: // Arbitrum One
+      return `https://arbiscan.io/address/${address}`;
+    case 31337: // Anvil (local)
+      return `#${address}`; // No explorer for local development
+    default:
+      return `https://etherscan.io/address/${address}`; // Default to Etherscan
+  }
+};
 
-  const {address: userAddress, isConnected } = useAccount();
+export default function RoscaCard({ address, index }: RoscaCardProps) {
+  const { address: userAddress, isConnected } = useAccount();
+  const chainId = useChainId();
   const { writeContract, isPending } = useWriteContract();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isWinner, setIsWinner] = useState(false);
   const [canContribute, setCanContribute] = useState(false);
+  const [members, setMembers] = useState<string[]>([]);
 
   // Read committee details
   const { data: contributionAmount } = useReadContract({
@@ -68,6 +101,7 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     functionName: "i_collectionInterval",
   });
 
+<<<<<<< HEAD
   //  const { data: memberStatus } = useReadContract({
   //   abi: CommitteeABI,
   //   address: address as `0x${string}`,
@@ -78,6 +112,10 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
 
 
   useWatchContractEvent({
+=======
+  const { data: memberStatus } = useReadContract({
+    abi: CommitteeABI,
+>>>>>>> origin/main
     address: address as `0x${string}`,
     abi: CommitteeABI,
     eventName: "WinnerPicked",
@@ -101,9 +139,45 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
   const { data: isWinnerOfCycle } = useReadContract({
     abi: CommitteeABI,
     address: address as `0x${string}`,
-    functionName: "", // 
+    functionName: "", //
     args: [address],
     // watch: true,
+  });
+
+  // Fetch member at index 0 to start
+  const { data: member0 } = useReadContract({
+    abi: CommitteeABI,
+    address: address as `0x${string}`,
+    functionName: "s_members",
+    args: [0],
+  });
+
+  const { data: member1 } = useReadContract({
+    abi: CommitteeABI,
+    address: address as `0x${string}`,
+    functionName: "s_members",
+    args: [1],
+  });
+
+  const { data: member2 } = useReadContract({
+    abi: CommitteeABI,
+    address: address as `0x${string}`,
+    functionName: "s_members",
+    args: [2],
+  });
+
+  const { data: member3 } = useReadContract({
+    abi: CommitteeABI,
+    address: address as `0x${string}`,
+    functionName: "s_members",
+    args: [3],
+  });
+
+  const { data: member4 } = useReadContract({
+    abi: CommitteeABI,
+    address: address as `0x${string}`,
+    functionName: "s_members",
+    args: [4],
   });
 
   // Calculate progress percentage
@@ -132,47 +206,75 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     ? "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
     : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
 
+<<<<<<< HEAD
     useEffect(() => {
       // if (memberStatus !== undefined) setIsMember(Boolean(memberStatus));
       if (isWinnerOfCycle !== undefined) setIsWinner(Boolean(isWinnerOfCycle));
       // if (currentCycle < totalCycles) setCanContribute(true); it's not implanted for now
       setCanContribute(true)
     }, [isWinnerOfCycle]);
+=======
+  useEffect(() => {
+    if (memberStatus !== undefined) setIsMember(Boolean(memberStatus));
+    if (isWinnerOfCycle !== undefined) setIsWinner(Boolean(isWinnerOfCycle));
+    // if (currentCycle < totalCycles) setCanContribute(true); it's not implanted for now
+    setCanContribute(true);
+  }, [memberStatus, isWinnerOfCycle]);
+>>>>>>> origin/main
 
-    const handleCopyAddress = () => {
-      navigator.clipboard.writeText(address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
+  useEffect(() => {
+    const memberList: string[] = [];
+    if (member0) memberList.push(member0 as string);
+    if (member1) memberList.push(member1 as string);
+    if (member2) memberList.push(member2 as string);
+    if (member3) memberList.push(member3 as string);
+    if (member4) memberList.push(member4 as string);
+    setMembers(memberList);
+  }, [member0, member1, member2, member3, member4]);
 
-    const handleDeposit = async () => {
-      if (!isConnected || !isMember || !canContribute || isPending) return alert("You must be a member!");
-      try {
-        await writeContract({
-          abi: CommitteeABI,
-          address: address as `0x${string}`,
-          functionName: "depositContribution",
-          args: [contributionAmount],
-        });
-      } catch (err) {
-        console.error(err);
-        alert("Deposit failed.");
-      }
-    };
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-    const handleWithdraw = async () => {
-      if (!isConnected || !isWinner) return alert("You’re not the winner.");
-      try {
-        await writeContract({
-          abi: CommitteeABI,
-          address: address as `0x${string}`,
-          functionName: "withdrawYourShare",
-        });
-      } catch (err) {
-        console.error(err);
-        alert("Withdraw failed.");
-      }
-    };
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
+
+  const handleCopyMemberAddress = (addr: string) => {
+    navigator.clipboard.writeText(addr);
+  };
+
+  const handleDeposit = async () => {
+    if (!isConnected || !isMember || !canContribute || isPending)
+      return alert("You must be a member!");
+    try {
+      await writeContract({
+        abi: CommitteeABI,
+        address: address as `0x${string}`,
+        functionName: "depositContribution",
+        args: [contributionAmount],
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Deposit failed.");
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (!isConnected || !isWinner) return alert("You’re not the winner.");
+    try {
+      await writeContract({
+        abi: CommitteeABI,
+        address: address as `0x${string}`,
+        functionName: "withdrawYourShare",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Withdraw failed.");
+    }
+  };
 
   return (
     <div className="card group hover:scale-105 transition-transform duration-300">
@@ -251,16 +353,17 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
         </div>
       </div>
 
-     {/* Deposit and Withdraw */}
+      {/* Deposit and Withdraw */}
       <div className="flex flex-col gap-3 mt-4">
         {/* Deposit Button */}
         <button
           onClick={handleDeposit}
           // disabled={!canContribute || !isMember || isPending}
           className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-200
-            ${isPending
-              ? "bg-gray-300 dark:bg-slate-700 text-gray-500 cursor-not-allowed"
-              : "bg-gradient-to-r from-primary-500 via-secondary-500 to-accent-500 text-white hover:opacity-90 shadow-md"
+            ${
+              isPending
+                ? "bg-gray-300 dark:bg-slate-700 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-primary-500 via-secondary-500 to-accent-500 text-white hover:opacity-90 shadow-md"
             }`}
         >
           {isPending ? "Processing..." : "Deposit Contribution"}
@@ -325,6 +428,36 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
               {hasEnded ? "Ended" : "Active"}
             </span>
           </div>
+
+          {/* Members List */}
+          <div>
+            <span className="text-sm text-gray-600 dark:text-slate-400 block mb-2">
+              Members ({members.length}):
+            </span>
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {members.map((member, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between bg-gray-50 dark:bg-slate-800/50 p-2 rounded-lg group"
+                >
+                  <div className="flex items-center gap-2 flex-1">
+                    <User className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500 flex-shrink-0" />
+                    <p className="font-mono text-xs text-gray-700 dark:text-slate-300 truncate flex-1">
+                      {formatAddress(member)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleCopyMemberAddress(member)}
+                    className="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100"
+                    title="Copy address"
+                  >
+                    <Copy className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div>
             <span className="text-sm text-gray-600 dark:text-slate-400 block mb-1">
               Contract Address:
@@ -334,11 +467,11 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
                 {address}
               </p>
               <a
-                href={`https://etherscan.io/address/${address}`}
+                href={getBlockExplorerUrl(chainId, address)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 flex-shrink-0"
-                title="View on Etherscan"
+                title="View on Block Explorer"
               >
                 <ExternalLink className="h-4 w-4" />
               </a>

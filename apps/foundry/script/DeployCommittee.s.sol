@@ -52,7 +52,6 @@ contract DeployCommittee is BaseDeployScript {
             link: config.networkConfig.link,
             registrar: config.networkConfig.registrar,
             registry: config.networkConfig.registry,
-            uniswapRouter: config.networkConfig.uniswapRouter,
             weth: config.networkConfig.weth
         });
 
