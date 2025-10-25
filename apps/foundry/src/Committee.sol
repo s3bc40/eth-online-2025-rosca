@@ -57,7 +57,6 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
         address link;
         address registrar;
         address registry;
-        address uniswapRouter;
         address weth;
     }
 
@@ -85,25 +84,30 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
     //--------- State Variables ---------//
     uint8 public s_currentCycle;
     uint256 public s_lastDistributionTime;
+    uint256 public s_cycleStartTime;
     uint256 public s_totalContribution;
     uint256 public s_cycleContribution;
+    uint256 public s_numberOfContributionsPerCycle;
     uint256 public s_upkeepId;
     address[] public s_members;
     address[] public s_remainingWinners;
-    CommitteeState public s_CommitteeState;
-    mapping(address => bool) public s_isMember;
+    CommitteeState public s_committeeState;
+    mapping(address => uint256) public s_lastContributionTime;
     mapping(address => uint256) public s_totalContributionPerMember;
     mapping(address => uint256) public s_cycleContributionPerMember;
     mapping(address => uint256) public s_cycleDistributionPerMember;
     mapping(address => bool) public s_hasWithdrawn;
+    mapping(address => bool) public s_isMember;
 
     //--------- Events ---------//
-    event ContributionDeposited(address indexed member, uint256 contributionAmount);
-    event ShareWithdrawn(address indexed member, uint256 shareAmount);
+    event ContributionDeposited(address indexed member, uint256 indexed contributionAmount);
+    event ShareWithdrawn(address indexed member, uint256 indexed shareAmount);
     event WinnerPicked(address indexed winner);
-    event FundsDeposited(address indexed funder, uint256 totalAmount, uint256 entropyAmount, uint256 linkAmount);
     event UpkeepFunded(uint256 indexed upkeepId, uint256 linkAmount);
     event UpkeepRegistered(uint256 indexed s_upkeepId);
+
+    //--------- Test Events ---------//
+    event timeStamp(uint256 indexed lastDepositTime, uint256 indexed cycleStartTime);
 
     /**
      * @notice Initializes the committee with configuration and external contracts
@@ -127,8 +131,10 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
         i_weth = contracts.weth;
 
         //--------- State Variable Assignments ---------//
-        s_CommitteeState = CommitteeState.OPEN;
+        s_numberOfContributionsPerCycle = config.distributionInterval / config.collectionInterval;
+        s_committeeState = CommitteeState.OPEN;
         s_lastDistributionTime = block.timestamp;
+        s_cycleStartTime = block.timestamp;
         s_members = config.members;
         s_remainingWinners = config.members;
         uint256 i;
@@ -145,36 +151,41 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
 
     receive() external payable {}
 
-    function performUpkeep(bytes calldata /* performData */ ) external override {
+    function performUpkeep(bytes calldata performData) external override {
         (bool upkeepNeeded,) = checkUpkeep("");
         if (!upkeepNeeded) {
             revert Committee__UpkeepNotNeeded();
         }
 
-        s_CommitteeState = CommitteeState.SELECTING_WINNER;
+        uint256 functionId = abi.decode(performData, (uint256));
 
-        if (s_remainingWinners.length > 1) {
-            uint128 requestFee = i_entropy.getFeeV2();
-            if (address(this).balance < requestFee) {
-                revert Committee__InsufficientFundsForRequest();
-            }
-            uint64 sequenceNumber = i_entropy.requestV2{value: requestFee}();
-        } else {
-            s_lastDistributionTime += i_collectionInterval;
-            s_currentCycle += 1;
-            uint256 totalMembers = s_members.length;
-            uint256 i;
-            for (; i < totalMembers;) {
-                s_cycleContributionPerMember[s_members[i]] = 0;
-                unchecked {
-                    ++i;
+        if (functionId == 1) {
+            s_committeeState = CommitteeState.SELECTING_WINNER;
+            if (s_remainingWinners.length > 1) {
+                uint128 requestFee = i_entropy.getFeeV2();
+                if (address(this).balance < requestFee) {
+                    revert Committee__InsufficientFundsForRequest();
                 }
+                uint64 sequenceNumber = i_entropy.requestV2{value: requestFee}();
+            } else {
+                s_lastDistributionTime = block.timestamp;
+                s_currentCycle += 1;
+                uint256 totalMembers = s_members.length;
+                uint256 i;
+                for (; i < totalMembers;) {
+                    s_cycleContributionPerMember[s_members[i]] = 0;
+                    unchecked {
+                        ++i;
+                    }
+                }
+                s_cycleDistributionPerMember[s_members[0]] = s_cycleContribution;
+                s_remainingWinners.pop();
+                s_cycleContribution = 0;
+                emit WinnerPicked(s_members[0]);
+                s_committeeState = CommitteeState.ENDED;
             }
-            s_cycleDistributionPerMember[s_members[0]] = s_cycleContribution;
-            s_remainingWinners.pop();
-            s_cycleContribution = 0;
-            emit WinnerPicked(s_members[0]);
-            s_CommitteeState = CommitteeState.ENDED;
+        } else if (functionId == 2) {
+            s_cycleStartTime = block.timestamp;
         }
     }
 
@@ -243,16 +254,18 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
      * @notice Withdraws all PYUSD held by the contract to the members.
      */
     function emergencyWithdrawToMembers() external onlyOwner {
-        if (s_CommitteeState == CommitteeState.SELECTING_WINNER) {
+        if (s_committeeState == CommitteeState.SELECTING_WINNER) {
             revert Committee__WinnerSelectionInProgress();
         }
         uint256 totalMembers = s_members.length;
         s_cycleContribution = 0;
         uint256 i;
         for (; i < totalMembers;) {
-            uint256 share = s_cycleDistributionPerMember[s_members[i]];
+            uint256 share = s_cycleContributionPerMember[s_members[i]];
             if (share != 0) {
-                s_cycleDistributionPerMember[s_members[i]] = 0;
+                s_totalContributionPerMember[s_members[i]] -= share;
+                s_cycleContributionPerMember[s_members[i]] = 0;
+                s_totalContribution -= share;
                 bool success = i_pyUsd.transfer(s_members[i], share);
                 if (!success) {
                     revert Committee__WithdrawFailed();
@@ -280,13 +293,15 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
         if (s_currentCycle >= i_totalCycles) {
             revert Committee__CycleOver();
         }
-        if (s_cycleContributionPerMember[msg.sender] != 0) {
+        emit timeStamp(s_lastContributionTime[msg.sender], s_cycleStartTime);
+        if (s_lastContributionTime[msg.sender] >= s_cycleStartTime) {
             revert Committee__WaitForNextCycleToStart();
         }
 
         //--------- Effects ---------//
+        s_lastContributionTime[msg.sender] = block.timestamp;
         s_totalContributionPerMember[msg.sender] += i_contributionAmount;
-        s_cycleContributionPerMember[msg.sender] = i_contributionAmount;
+        s_cycleContributionPerMember[msg.sender] += i_contributionAmount;
         s_totalContribution += i_contributionAmount;
         s_cycleContribution += i_contributionAmount;
         emit ContributionDeposited(msg.sender, i_contributionAmount);
@@ -315,23 +330,33 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
 
     function checkUpkeep(bytes memory /* checkData */ )
         public
-        view
         override
         returns (bool upkeepNeeded, bytes memory /* performData */ )
     {
         bool isDistributionTime = _isDistributionTime();
-        bool hasEveryoneContributed = s_cycleContribution == (s_members.length * i_contributionAmount);
+        bool hasEveryoneContributed =
+            s_cycleContribution == ((s_members.length * i_contributionAmount) * s_numberOfContributionsPerCycle);
         bool cycleHasNotEnded = s_currentCycle < i_totalCycles;
-        upkeepNeeded = (
-            isDistributionTime && hasEveryoneContributed && cycleHasNotEnded && s_CommitteeState == CommitteeState.OPEN
+        bool checkUpkeep1 = (
+            isDistributionTime && hasEveryoneContributed && cycleHasNotEnded && s_committeeState == CommitteeState.OPEN
         );
-        return (upkeepNeeded, "0x0");
+        bool checkUpkeep2 =
+            (s_cycleStartTime + i_collectionInterval <= block.timestamp && s_committeeState == CommitteeState.OPEN);
+
+        if (checkUpkeep1) {
+            return (true, abi.encode(uint256(1)));
+        } else if (checkUpkeep2) {
+            return (true, abi.encode(uint256(2)));
+        }
+
+        return (false, "");
     }
 
     function entropyCallback(uint64 sequenceNumber, address _providerAddress, bytes32 randomNumber) internal override {
         {
-            s_lastDistributionTime += i_collectionInterval;
+            s_lastDistributionTime = block.timestamp;
             s_currentCycle += 1;
+            s_cycleStartTime = block.timestamp;
             uint256 totalMembers = s_members.length;
             uint256 i;
             for (; i < totalMembers;) {
@@ -353,7 +378,8 @@ contract Committee is Ownable, AutomationCompatibleInterface, IEntropyConsumer {
         s_cycleDistributionPerMember[winner] = s_cycleContribution;
         emit WinnerPicked(winner);
         s_cycleContribution = 0;
-        s_CommitteeState = CommitteeState.OPEN;
+        s_committeeState = CommitteeState.OPEN;
+        s_cycleStartTime = block.timestamp;
     }
 
     function getEntropy() internal view override returns (address) {

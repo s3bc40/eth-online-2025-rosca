@@ -2,6 +2,7 @@
 pragma solidity 0.8.20;
 
 import {Committee} from "./Committee.sol";
+import {ICommitteeDeployer} from "./CommitteeDeployer.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -14,6 +15,7 @@ contract Factory is Ownable {
     //--------- Errors ---------//
     error Factory__CommitteeAlreadyActive(address _committee);
     error Factory__MaxCommitteeMembersExceeded();
+    error Factory__CanNotBeLessThanFive();
 
     //--------- Immutables ---------//
     address public immutable i_PyUsd;
@@ -21,11 +23,11 @@ contract Factory is Ownable {
     address public immutable i_link;
     address public immutable i_registrar;
     address public immutable i_registry;
-    address public immutable i_uniswapRouter;
     address public immutable i_weth;
+    ICommitteeDeployer public immutable i_committeeDeployer;
 
     //--------- State Variables ---------//
-    uint8 public maxCommitteeMembers;
+    uint8 public maxCommitteeMembers; // minimum 5
     mapping(address => address[]) public multiSigToCommittees;
 
     //--------- Events ---------//
@@ -39,7 +41,6 @@ contract Factory is Ownable {
      * @param _link Address of the LINK token
      * @param _registrar Address of the Chainlink Automation Registrar
      * @param _registry Address of the Chainlink Automation Registry
-     * @param _uniswapRouter Address of Uniswap V2 Router
      * @param _weth Address of WETH token
      * @param _maxCommitteeMembers The initial maximum number of committee members allowed
      */
@@ -49,18 +50,21 @@ contract Factory is Ownable {
         address _link,
         address _registrar,
         address _registry,
-        address _uniswapRouter,
         address _weth,
-        uint8 _maxCommitteeMembers
+        uint8 _maxCommitteeMembers,
+        address _committeeDeployer
     ) Ownable(msg.sender) {
+        if (_maxCommitteeMembers < 5) {
+            revert Factory__CanNotBeLessThanFive();
+        }
         i_PyUsd = _pyUsd;
         i_entropy = _entropy;
         i_link = _link;
         i_registrar = _registrar;
         i_registry = _registry;
-        i_uniswapRouter = _uniswapRouter;
         i_weth = _weth;
         maxCommitteeMembers = _maxCommitteeMembers;
+        i_committeeDeployer = ICommitteeDeployer(_committeeDeployer);
     }
 
     /**
@@ -86,7 +90,7 @@ contract Factory is Ownable {
         uint256 length = multiSigToCommittees[_multiSigAccount].length;
         if (length > 0) {
             address lastCommittee = multiSigToCommittees[_multiSigAccount][length - 1];
-            if (Committee(payable(lastCommittee)).s_CommitteeState() != Committee.CommitteeState.ENDED) {
+            if (Committee(payable(lastCommittee)).s_committeeState() != Committee.CommitteeState.ENDED) {
                 revert Factory__CommitteeAlreadyActive(lastCommittee);
             }
         }
@@ -102,10 +106,9 @@ contract Factory is Ownable {
             link: i_link,
             registrar: i_registrar,
             registry: i_registry,
-            uniswapRouter: i_uniswapRouter,
             weth: i_weth
         });
-        address newCommittee = address(new Committee(committeeConfig, externalContracts, _multiSigAccount));
+        address newCommittee = i_committeeDeployer.deployCommittee(committeeConfig, externalContracts, _multiSigAccount);
         multiSigToCommittees[_multiSigAccount].push(newCommittee);
         emit CommitteeCreated(_multiSigAccount, newCommittee);
         return newCommittee;
@@ -116,6 +119,9 @@ contract Factory is Ownable {
      * @param _maxCommitteeMembers New maximum member count
      */
     function updateMaxCommitteeMembers(uint8 _maxCommitteeMembers) external onlyOwner {
+        if (_maxCommitteeMembers < 5) {
+            revert Factory__CanNotBeLessThanFive();
+        }
         maxCommitteeMembers = _maxCommitteeMembers;
         emit MaxCommitteeMembersUpdated(_maxCommitteeMembers);
     }

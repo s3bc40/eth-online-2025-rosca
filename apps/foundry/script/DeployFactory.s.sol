@@ -4,6 +4,7 @@ pragma solidity 0.8.20;
 import {Script, console} from "forge-std/Script.sol";
 import {BaseDeployScript} from "./BaseDeployScript.sol";
 import {Factory} from "../src/Factory.sol";
+import {CommitteeDeployer} from "../src/CommitteeDeployer.sol";
 
 /**
  * @title DeployFactory
@@ -48,9 +49,9 @@ contract DeployFactory is BaseDeployScript {
             config.networkConfig.link,
             config.networkConfig.registrar,
             config.networkConfig.registry,
-            config.networkConfig.uniswapRouter,
             config.networkConfig.weth,
-            config.networkConfig.maxCommitteeMembers
+            config.networkConfig.maxCommitteeMembers,
+            address(new CommitteeDeployer())
         );
 
         console.log("\n===========================================");
