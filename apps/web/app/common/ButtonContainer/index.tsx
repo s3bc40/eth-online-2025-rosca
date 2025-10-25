@@ -20,7 +20,7 @@ type ButtonProps = {
   disabled?: boolean;
 };
 
-export function ButtonContainer({
+export default function ButtonContainer({
   className = "",
   icon,
   label,

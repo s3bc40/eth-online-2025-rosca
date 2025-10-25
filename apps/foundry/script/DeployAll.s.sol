@@ -5,6 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {BaseDeployScript} from "./BaseDeployScript.sol";
 import {Factory} from "../src/Factory.sol";
 import {Committee} from "../src/Committee.sol";
+import {CommitteeDeployer} from "../src/CommitteeDeployer.sol";
 
 /**
  * @title DeployAll
@@ -17,8 +18,8 @@ contract DeployAll is BaseDeployScript {
 
     // Test configuration
     uint256 constant TEST_CONTRIBUTION = 50e6; // 50 PyUSD
-    uint256 constant TEST_COLLECTION_INTERVAL = 3 days;
-    uint256 constant TEST_DISTRIBUTION_INTERVAL = 7 days;
+    uint256 constant TEST_COLLECTION_INTERVAL = 7 days;
+    uint256 constant TEST_DISTRIBUTION_INTERVAL = 14 days;
 
     function run() public override broadcast {
         setUp();
@@ -61,9 +62,9 @@ contract DeployAll is BaseDeployScript {
             config.networkConfig.link,
             config.networkConfig.registrar,
             config.networkConfig.registry,
-            config.networkConfig.uniswapRouter,
             config.networkConfig.weth,
-            config.networkConfig.maxCommitteeMembers
+            config.networkConfig.maxCommitteeMembers,
+            address(new CommitteeDeployer())
         );
 
         console.log("Factory deployed at:", address(factory));
