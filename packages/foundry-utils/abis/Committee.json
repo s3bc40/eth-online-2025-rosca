@@ -60,11 +60,6 @@
             "internalType": "address"
           },
           {
-            "name": "uniswapRouter",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
             "name": "weth",
             "type": "address",
             "internalType": "address"
@@ -141,7 +136,7 @@
         "internalType": "bytes"
       }
     ],
-    "stateMutability": "view"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -153,6 +148,13 @@
         "internalType": "uint256"
       }
     ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "emergencyWithdrawToMembers",
+    "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -175,25 +177,6 @@
     "inputs": [],
     "outputs": [],
     "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "getExpectedLinkOutput",
-    "inputs": [
-      {
-        "name": "_ethAmount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -332,21 +315,8 @@
     "outputs": [
       {
         "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "i_uniswapRouter",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IUniswapV2Router"
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ],
     "stateMutability": "view"
@@ -382,7 +352,7 @@
     "name": "performUpkeep",
     "inputs": [
       {
-        "name": "",
+        "name": "performData",
         "type": "bytes",
         "internalType": "bytes"
       }
@@ -399,13 +369,26 @@
   },
   {
     "type": "function",
+    "name": "s_committeeState",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "enum Committee.CommitteeState"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "s_currentCycle",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ],
     "stateMutability": "view"
@@ -463,13 +446,13 @@
   },
   {
     "type": "function",
-    "name": "s_hasEnded",
+    "name": "s_cycleStartTime",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "bool",
-        "internalType": "bool"
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
@@ -514,6 +497,25 @@
   },
   {
     "type": "function",
+    "name": "s_lastContributionTime",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "s_lastDistributionTime",
     "inputs": [],
     "outputs": [
@@ -540,6 +542,19 @@
         "name": "",
         "type": "address",
         "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "s_numberOfContributionsPerCycle",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
@@ -655,38 +670,7 @@
       {
         "name": "contributionAmount",
         "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "FundsDeposited",
-    "inputs": [
-      {
-        "name": "funder",
-        "type": "address",
         "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "totalAmount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "entropyAmount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "linkAmount",
-        "type": "uint256",
-        "indexed": false,
         "internalType": "uint256"
       }
     ],
@@ -724,7 +708,7 @@
       {
         "name": "shareAmount",
         "type": "uint256",
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256"
       }
     ],
@@ -776,6 +760,25 @@
     "anonymous": false
   },
   {
+    "type": "event",
+    "name": "timeStamp",
+    "inputs": [
+      {
+        "name": "lastDepositTime",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "cycleStartTime",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
     "type": "error",
     "name": "Committee__AlreadyWithdrawn",
     "inputs": []
@@ -812,11 +815,6 @@
   },
   {
     "type": "error",
-    "name": "Committee__InvalidPercentage",
-    "inputs": []
-  },
-  {
-    "type": "error",
     "name": "Committee__LinkTransferFailed",
     "inputs": []
   },
@@ -832,11 +830,6 @@
   },
   {
     "type": "error",
-    "name": "Committee__SwapFailed",
-    "inputs": []
-  },
-  {
-    "type": "error",
     "name": "Committee__UpkeepNotNeeded",
     "inputs": []
   },
@@ -848,6 +841,11 @@
   {
     "type": "error",
     "name": "Committee__WaitForNextCycleToStart",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "Committee__WinnerSelectionInProgress",
     "inputs": []
   },
   {

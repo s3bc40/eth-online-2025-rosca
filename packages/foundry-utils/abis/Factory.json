@@ -28,19 +28,19 @@
         "internalType": "address"
       },
       {
-        "name": "_uniswapRouter",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
         "name": "_weth",
         "type": "address",
         "internalType": "address"
       },
       {
         "name": "_maxCommitteeMembers",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "_committeeDeployer",
+        "type": "address",
+        "internalType": "address"
       }
     ],
     "stateMutability": "nonpayable"
@@ -156,6 +156,19 @@
   },
   {
     "type": "function",
+    "name": "i_committeeDeployer",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract ICommitteeDeployer"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "i_entropy",
     "inputs": [],
     "outputs": [
@@ -208,19 +221,6 @@
   },
   {
     "type": "function",
-    "name": "i_uniswapRouter",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "i_weth",
     "inputs": [],
     "outputs": [
@@ -239,8 +239,8 @@
     "outputs": [
       {
         "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ],
     "stateMutability": "view"
@@ -308,8 +308,8 @@
     "inputs": [
       {
         "name": "_maxCommitteeMembers",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ],
     "outputs": [],
@@ -340,9 +340,9 @@
     "inputs": [
       {
         "name": "newMax",
-        "type": "uint256",
+        "type": "uint96",
         "indexed": false,
-        "internalType": "uint256"
+        "internalType": "uint96"
       }
     ],
     "anonymous": false
@@ -365,6 +365,11 @@
       }
     ],
     "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "Factory__CanNotBeLessThanFive",
+    "inputs": []
   },
   {
     "type": "error",

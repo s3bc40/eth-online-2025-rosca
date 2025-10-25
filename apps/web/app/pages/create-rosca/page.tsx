@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
-import SafeSetupPage from "../../components/MultisigWallet/MultisigWallet"
+import SafeSetupPage from "../../components/MultisigWallet/MultisigWallet";
 import {
   useAccount,
   useChainId,
@@ -37,7 +37,6 @@ export default function CreateRosca() {
   const [multiSigAddress, setMultiSigAddress] = useState("");
   const [open, setOpen] = useState(false);
 
-
   // Wagmi hooks
   const chainId = useChainId();
   const { address } = useAccount();
@@ -48,22 +47,22 @@ export default function CreateRosca() {
 
   // @DEV -> to remove later, it's an example
   // SafeKit hook
-  const { initSafeProtocolKit, safeKit } = useSafeProtocolKit();
+  // const { initSafeProtocolKit, safeKit } = useSafeProtocolKit();
 
-  useEffect(() => {
-    const actualMembers = members.filter((m) => m.trim() !== "");
-    if (actualMembers.length < MINIMAL_MEMBERS) return;
-    // Initialize Safe Protocol Kit when multiSigAddress or members change
-    const initializeKit = async () => {
-      initSafeProtocolKit(
-        actualMembers as `0x${string}`[],
-        MEMBERS_SAFE_THRESHOLD
-      );
-      setMultiSigAddress((await safeKit?.getAddress()) || "");
-    };
+  // useEffect(() => {
+  //   const actualMembers = members.filter((m) => m.trim() !== "");
+  //   if (actualMembers.length < MINIMAL_MEMBERS) return;
+  //   // Initialize Safe Protocol Kit when multiSigAddress or members change
+  //   const initializeKit = async () => {
+  //     initSafeProtocolKit(
+  //       actualMembers as `0x${string}`[],
+  //       MEMBERS_SAFE_THRESHOLD
+  //     );
+  //     setMultiSigAddress((await safeKit?.getAddress()) || "");
+  //   };
 
-    initializeKit();
-  }, [members, initSafeProtocolKit, safeKit, setMultiSigAddress]);
+  //   initializeKit();
+  // }, [members, initSafeProtocolKit, safeKit, setMultiSigAddress]);
   // @DEV -> to remove later, it's an example
 
   // Multisig addresses hook
@@ -244,7 +243,9 @@ export default function CreateRosca() {
                       Multi-Sig Account Address
                     </p>
                     <div className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 font-mono break-all">
-                      {multiSigAddress ? multiSigAddress : "No Safe connected yet"}
+                      {multiSigAddress
+                        ? multiSigAddress
+                        : "No Safe connected yet"}
                     </div>
                   </div>
 
@@ -274,7 +275,6 @@ export default function CreateRosca() {
                     </div>
                   )}
                 </div>
-                
               </div>
 
               {/* Members */}

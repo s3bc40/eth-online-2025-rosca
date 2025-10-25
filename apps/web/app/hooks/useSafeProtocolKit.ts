@@ -127,9 +127,6 @@ export default function useSafeProtocolKit() {
 
     let protocolKit;
 
-    console.log("Owners:", owners);
-    console.log("Threshold:", threshold);
-
     if (owners != undefined && threshold != undefined) {
       // Setup Safe account configuration
       const safeAccountConfig: SafeAccountConfig = {
@@ -147,12 +144,6 @@ export default function useSafeProtocolKit() {
         safeAccountConfig,
         safeDeploymentConfig,
       };
-
-      console.log("Predicted Safe Config:", predictedSafe);
-      console.log("Chains:", chains);
-      console.log("Contract Networks:", getContractNetworks(chains));
-      console.log("Provider:", provider);
-      console.log("Signer:", signer);
 
       // Get protocol kit instance
       protocolKit = await Safe.init({
