@@ -5,7 +5,11 @@ import { useAccount } from "wagmi";
 import useSafeProtocolKit from "../../hooks/useSafeProtocolKit";
 import { PlusCircle, Trash2 } from "lucide-react";
 
-export default function SafeSetupPage({ onSafeConnected }) {
+type SafeSetupPageProps = {
+  onSafeConnected: (safeAddress: string) => void;
+};
+
+export default function SafeSetupPage({ onSafeConnected }: SafeSetupPageProps) {
   const { address } = useAccount();
   const { createSafeWallet, connectSafeWallet, isSafeDeployed } =
     useSafeProtocolKit();
