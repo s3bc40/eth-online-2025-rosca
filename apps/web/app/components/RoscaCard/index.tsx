@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useReadContract, useAccount, useWriteContract } from "wagmi";
+import { useReadContract, useAccount, useWriteContract, useWatchContractEvent } from "wagmi";
 import CommitteeABI from "@repo/foundry-utils/abis/Committee.json";
 import { formatUnits } from "viem";
 import {
@@ -14,7 +14,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import ButtonContainer from "../../common/ButtonContainer/index"
+import { log } from "console";
+
 interface RoscaCardProps {
   address: string;
   index: number;
@@ -67,12 +68,30 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     functionName: "i_collectionInterval",
   });
 
-   const { data: memberStatus } = useReadContract({
-    abi: CommitteeABI,
+  //  const { data: memberStatus } = useReadContract({
+  //   abi: CommitteeABI,
+  //   address: address as `0x${string}`,
+  //   functionName: "s_isMember",
+  //   args: [userAddress],
+  //   // watch: true,
+  // });
+
+  useWatchContractEvent({
     address: address as `0x${string}`,
-    functionName: "s_isMember",
-    args: [userAddress],
-    // watch: true,
+    abi: CommitteeABI,
+    eventName: "WinnerPicked",
+    onLogs(logs) {
+      logs.forEach((log) => {
+
+        const winner = log.args.winner
+        if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
+          setIsWinner(true)
+        } else {
+        setIsWinner(false);
+      }
+      
+      })
+    },
   });
 
   const { data: isWinnerOfCycle } = useReadContract({
@@ -110,11 +129,11 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
 
     useEffect(() => {
-      if (memberStatus !== undefined) setIsMember(Boolean(memberStatus));
+      // if (memberStatus !== undefined) setIsMember(Boolean(memberStatus));
       if (isWinnerOfCycle !== undefined) setIsWinner(Boolean(isWinnerOfCycle));
       // if (currentCycle < totalCycles) setCanContribute(true); it's not implanted for now
       setCanContribute(true)
-    }, [memberStatus, isWinnerOfCycle]);
+    }, [isWinnerOfCycle]);
 
     const handleCopyAddress = () => {
       navigator.clipboard.writeText(address);
