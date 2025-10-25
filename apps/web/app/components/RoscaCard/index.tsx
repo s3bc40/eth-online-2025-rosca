@@ -1,19 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
-import { useReadContract, useAccount, useWriteContract, useWatchContractEvent } from "wagmi";
-=======
-import {
-  useReadContract,
-  useAccount,
-  useWriteContract,
-  useChainId,
-} from "wagmi";
->>>>>>> origin/main
+
+import { useReadContract, useAccount, useWriteContract, useWatchContractEvent, useChainId } from "wagmi";
+
 import CommitteeABI from "@repo/foundry-utils/abis/Committee.json";
 import { formatUnits } from "viem";
-import { ethers } from "ethers";
+import { Interface } from "ethers";
 import {
   Users,
   DollarSign,
@@ -25,10 +18,6 @@ import {
   ChevronUp,
   User,
 } from "lucide-react";
-<<<<<<< HEAD
-=======
-import ButtonContainer from "../../common/ButtonContainer/index";
->>>>>>> origin/main
 
 interface RoscaCardProps {
   address: string;
@@ -101,29 +90,18 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     functionName: "i_collectionInterval",
   });
 
-<<<<<<< HEAD
-  //  const { data: memberStatus } = useReadContract({
-  //   abi: CommitteeABI,
-  //   address: address as `0x${string}`,
-  //   functionName: "s_isMember",
-  //   args: [userAddress],
-  //   // watch: true,
-  // });
 
 
   useWatchContractEvent({
-=======
-  const { data: memberStatus } = useReadContract({
-    abi: CommitteeABI,
->>>>>>> origin/main
     address: address as `0x${string}`,
     abi: CommitteeABI,
     eventName: "WinnerPicked",
     onLogs(logs) {
-      const iface = new ethers.utils.Interface(CommitteeABI);
+      const iface = new Interface(CommitteeABI);
 
       logs.forEach((log) => {
         const decoded = iface.parseLog(log);
+        if (!decoded) return;
         const winner = decoded.args.winner;
         
         if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
@@ -206,21 +184,13 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
     ? "bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300"
     : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
 
-<<<<<<< HEAD
     useEffect(() => {
       // if (memberStatus !== undefined) setIsMember(Boolean(memberStatus));
       if (isWinnerOfCycle !== undefined) setIsWinner(Boolean(isWinnerOfCycle));
       // if (currentCycle < totalCycles) setCanContribute(true); it's not implanted for now
       setCanContribute(true)
     }, [isWinnerOfCycle]);
-=======
-  useEffect(() => {
-    if (memberStatus !== undefined) setIsMember(Boolean(memberStatus));
-    if (isWinnerOfCycle !== undefined) setIsWinner(Boolean(isWinnerOfCycle));
-    // if (currentCycle < totalCycles) setCanContribute(true); it's not implanted for now
-    setCanContribute(true);
-  }, [memberStatus, isWinnerOfCycle]);
->>>>>>> origin/main
+
 
   useEffect(() => {
     const memberList: string[] = [];
