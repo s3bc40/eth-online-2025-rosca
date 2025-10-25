@@ -14,7 +14,6 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { log } from "console";
 
 interface RoscaCardProps {
   address: string;
@@ -77,22 +76,36 @@ export default function RoscaCard({ address, index }: RoscaCardProps) {
   // });
 
   useWatchContractEvent({
-    address: address as `0x${string}`,
-    abi: CommitteeABI,
-    eventName: "WinnerPicked",
-    onLogs(logs) {
-      logs.forEach((log) => {
+  address: address as `0x${string}`,
+  abi: CommitteeABI,
+  eventName: "WinnerPicked",
+  onEvent(event) {
+    const winner = event.args.winner;
 
-        const winner = log.args.winner
-        if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
-          setIsWinner(true)
-        } else {
-        setIsWinner(false);
-      }
+    if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
+      setIsWinner(true);
+    } else {
+      setIsWinner(false);
+    }
+  },
+});
+  // useWatchContractEvent({
+  //   address: address as `0x${string}`,
+  //   abi: CommitteeABI,
+  //   eventName: "WinnerPicked",
+  //   onLogs(logs) {
+  //     logs.forEach((log) => {
+
+  //       const winner = log.args.winner
+  //       if (userAddress && winner.toLowerCase() === userAddress.toLowerCase()) {
+  //         setIsWinner(true)
+  //       } else {
+  //       setIsWinner(false);
+  //     }
       
-      })
-    },
-  });
+  //     })
+  //   },
+  // });
 
   const { data: isWinnerOfCycle } = useReadContract({
     abi: CommitteeABI,
